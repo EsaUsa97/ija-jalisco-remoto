@@ -16,8 +16,11 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024  # Máx 25 MB por archivo
-JWT_SECRET = os.getenv('JWT_SECRET', 'IJA_JALISCO_SECRETO_INSTITUCIONAL_2026')
+app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024  # Máx 25 MB por evidencia
+JWT_SECRET = os.getenv('JWT_SECRET', 'OIC_IJA_JALISCO_SECRETO_2026')
+OIC_EMAIL = os.getenv('OIC_EMAIL', 'oic@ija.gob.mx').strip().lower()
+OIC_PASSWORD = os.getenv('OIC_PASSWORD', 'OIC_IJA_2026#')
+
 DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
 USAR_POSTGRES = DATABASE_URL.startswith('postgres://') or DATABASE_URL.startswith('postgresql://')
 
@@ -71,7 +74,7 @@ def init_db():
             materia TEXT,
             relato TEXT,
             contraparte TEXT,
-            estatus TEXT DEFAULT 'En revisión por abogado',
+            estatus TEXT DEFAULT 'Recibida por el OIC',
             cita TEXT,
             acta_legal TEXT,
             firma_base64 TEXT,
@@ -105,6 +108,15 @@ def init_db():
     ]
     for t in tablas:
         cur.execute(t)
+
+    # Garantizar que exista la cuenta única institucional del Órgano Interno de Control
+    cur.execute(sql('SELECT id FROM usuarios WHERE email = ?'), (OIC_EMAIL,))
+    existe_oic = cur.fetchone()
+    if not existe_oic:
+        cur.execute(
+            sql('INSERT INTO usuarios (nombre, email, password_hash, rol, municipio, acepto_terminos, fecha_aceptacion) VALUES (?, ?, ?, ?, ?, 1, ?)'),
+            ('Titular / Abogado Investigador OIC - IJA', OIC_EMAIL, generate_password_hash(OIC_PASSWORD), 'abogado', 'Guadalajara', datetime.now().isoformat())
+        )
     conn.commit()
     conn.close()
 
@@ -150,8 +162,8 @@ def index():
 def health():
     return jsonify({
         'status': 'ok',
-        'motor_bd': 'PostgreSQL (Nube)' if USAR_POSTGRES else 'SQLite (Local)',
-        'boveda': BOVEDA_DIR
+        'organo': 'Órgano Interno de Control - IJA Jalisco',
+        'motor_bd': 'PostgreSQL (Nube)' if USAR_POSTGRES else 'SQLite (Local)'
     })
 
 @app.route('/api/auth/registro', methods=['POST'])
@@ -160,11 +172,14 @@ def registro():
     nombre = (data.get('nombre') or '').strip()
     email = (data.get('email') or '').strip().lower()
     password = data.get('password') or ''
-    rol = data.get('rol', 'ciudadano')
 
-    if not nombre or not email or len(password) < 4:
-        return jsonify({'error': 'Datos incompletos o contraseña muy corta'}), 400
+    # Seguridad: Nadie puede auto-registrarse como abogado del OIC ni usar el correo institucional
+    if email == OIC_EMAIL:
+        return jsonify({'error': 'Este correo pertenece al Órgano Interno de Control.'}), 403
+    if not nombre or not email or len(password) < 6:
+        return jsonify({'error': 'Complete todos los campos (contraseña mínimo 6 caracteres).'}), 400
 
+    rol = 'ciudadano'
     conn = get_db()
     cur = conn.cursor()
     try:
@@ -182,22 +197,21 @@ def registro():
             )
             user_id = cur.lastrowid
 
-        if rol == 'ciudadano':
-            folio = f"IJA-JAL-2026-{user_id:04d}"
-            cur.execute(
-                sql('INSERT INTO expedientes (folio, ciudadano_id, creado_en) VALUES (?, ?, ?)'),
-                (folio, user_id, ahora)
-            )
+        folio = f"OIC-IJA-2026-{user_id:04d}"
+        cur.execute(
+            sql('INSERT INTO expedientes (folio, ciudadano_id, estatus, creado_en) VALUES (?, ?, ?, ?)'),
+            (folio, user_id, 'Denuncia recibida por el OIC', ahora)
+        )
         conn.commit()
     except Exception:
         conn.rollback()
         conn.close()
-        return jsonify({'error': 'Este correo ya está registrado'}), 409
+        return jsonify({'error': 'Este correo ya está registrado. Inicie sesión con su cuenta.'}), 409
 
     usuario = {'id': user_id, 'nombre': nombre, 'email': email, 'rol': rol}
     token = jwt.encode({**usuario, 'exp': datetime.utcnow() + timedelta(hours=8)}, JWT_SECRET, algorithm='HS256')
     conn.close()
-    registrar_auditoria(email, f'REGISTRO_ACEPTACION_LEGAL ({rol})')
+    registrar_auditoria(email, 'REGISTRO_DENUNCIANTE_ACEPTACION_LEGAL')
     return jsonify({'token': token, 'usuario': usuario})
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -226,12 +240,14 @@ def login():
             registro_ip['conteo'] = 0
         intentos_login[ip] = registro_ip
         registrar_auditoria(email, 'LOGIN_FALLIDO')
-        return jsonify({'error': 'Credenciales incorrectas'}), 401
+        return jsonify({'error': 'Correo o contraseña incorrectos'}), 401
 
+    # Solo el correo único del OIC tiene rol de abogado investigador
+    rol_real = 'abogado' if email == OIC_EMAIL else 'ciudadano'
     intentos_login[ip] = {'conteo': 0, 'bloqueo_hasta': 0}
-    usuario = {'id': user['id'], 'nombre': user['nombre'], 'email': user['email'], 'rol': user['rol']}
+    usuario = {'id': user['id'], 'nombre': user['nombre'], 'email': user['email'], 'rol': rol_real}
     token = jwt.encode({**usuario, 'exp': datetime.utcnow() + timedelta(hours=8)}, JWT_SECRET, algorithm='HS256')
-    registrar_auditoria(email, 'LOGIN_EXITOSO')
+    registrar_auditoria(email, f'LOGIN_EXITOSO ({rol_real})')
     return jsonify({'token': token, 'usuario': usuario})
 
 @app.route('/api/expedientes', methods=['GET'])
@@ -239,15 +255,16 @@ def login():
 def listar_expedientes():
     conn = get_db()
     cur = conn.cursor()
-    if request.usuario['rol'] == 'abogado':
+    # Si entra con el correo único del OIC, recibe TODAS las denuncias de todos los ciudadanos
+    if request.usuario['email'] == OIC_EMAIL and request.usuario['rol'] == 'abogado':
         cur.execute('''
-            SELECT e.*, u.nombre as ciudadano_nombre, u.edad, u.municipio
+            SELECT e.*, u.nombre as ciudadano_nombre, u.edad, u.municipio, u.email as ciudadano_email
             FROM expedientes e JOIN usuarios u ON e.ciudadano_id = u.id
             ORDER BY e.id DESC
         ''')
     else:
         cur.execute(sql('''
-            SELECT e.*, u.nombre as ciudadano_nombre, u.edad, u.municipio
+            SELECT e.*, u.nombre as ciudadano_nombre, u.edad, u.municipio, u.email as ciudadano_email
             FROM expedientes e JOIN usuarios u ON e.ciudadano_id = u.id
             WHERE e.ciudadano_id = ?
         '''), (request.usuario['id'],))
@@ -281,7 +298,7 @@ def actualizar_expediente(exp_id):
         cur.execute(sql(f"UPDATE expedientes SET {', '.join(campos)} WHERE id = ?"), valores)
         conn.commit()
     conn.close()
-    registrar_auditoria(request.usuario['email'], f'ACTUALIZACION_EXPEDIENTE_{exp_id}')
+    registrar_auditoria(request.usuario['email'], f'ACTUALIZACION_DENUNCIA_{exp_id}')
     return jsonify({'ok': True})
 
 @app.route('/api/expedientes/<int:exp_id>/pruebas', methods=['POST'])
@@ -307,7 +324,7 @@ def subir_prueba(exp_id):
     total = (fila['total'] if isinstance(fila, dict) else fila[0]) + 1
 
     tipo = request.form.get('tipo', 'Documento')
-    prefijo = 'VID' if 'Video' in tipo else 'DOC'
+    prefijo = 'VID' if 'Video' in tipo else 'PRU'
     codigo = f"{prefijo}-{total:02d}"
 
     cur.execute(
@@ -316,7 +333,7 @@ def subir_prueba(exp_id):
     )
     conn.commit()
     conn.close()
-    registrar_auditoria(request.usuario['email'], f'SUBIDA_BOVEDA_{codigo}_SHA256')
+    registrar_auditoria(request.usuario['email'], f'EVIDENCIA_OIC_{codigo}_SHA256')
     return jsonify({'ok': True, 'hash_sha256': hash_sha256})
 
 @app.route('/api/pruebas/<int:prueba_id>/descargar', methods=['GET'])
@@ -329,7 +346,7 @@ def descargar_prueba(prueba_id):
     conn.close()
     if not prueba or not os.path.exists(prueba['ruta_guardada']):
         return jsonify({'error': 'Archivo no encontrado'}), 404
-    registrar_auditoria(request.usuario['email'], f'DESCARGA_BOVEDA_{prueba_id}')
+    registrar_auditoria(request.usuario['email'], f'DESCARGA_EVIDENCIA_{prueba_id}')
     return send_file(prueba['ruta_guardada'], as_attachment=True, download_name=prueba['nombre_archivo'])
 
 @app.route('/api/expedientes/<int:exp_id>/mensajes', methods=['POST'])
@@ -341,9 +358,10 @@ def enviar_mensaje(exp_id):
         return jsonify({'error': 'Mensaje vacío'}), 400
     conn = get_db()
     cur = conn.cursor()
+    etiqueta_rol = 'Órgano Interno de Control' if request.usuario['rol'] == 'abogado' else 'Denunciante'
     cur.execute(
         sql('INSERT INTO mensajes (expediente_id, autor_nombre, emisor_rol, contenido, enviado_en) VALUES (?, ?, ?, ?, ?)'),
-        (exp_id, request.usuario['nombre'], request.usuario['rol'], contenido, datetime.now().isoformat())
+        (exp_id, request.usuario['nombre'], etiqueta_rol, contenido, datetime.now().isoformat())
     )
     conn.commit()
     conn.close()
