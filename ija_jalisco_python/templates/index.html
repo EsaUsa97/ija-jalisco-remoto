@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IJA Jalisco | Plataforma de Atención Remota Preferente</title>
+  <title>OIC - IJA Jalisco | Denuncias a Distancia contra Personas Servidoras Públicas</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body.texto-grande { font-size: 1.2rem; }
@@ -21,16 +21,18 @@
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans">
 
   <!-- Barra Superior Institucional -->
-  <header class="bg-white border-b-4 border-amber-500 shadow-sm sticky top-0 z-40 no-imprimir">
+  <header class="bg-white border-b-4 border-amber-600 shadow-sm sticky top-0 z-40 no-imprimir">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="w-11 h-11 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center font-bold text-xl shadow">
           ⚖
         </div>
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700 block">Gobierno del Estado de Jalisco</span>
-          <h1 class="font-bold text-lg text-slate-900 leading-tight">Instituto de Justicia Alternativa (IJA)</h1>
-          <p class="text-xs text-slate-500">Plataforma de Atención Remota Preferente · Cifrado SHA-256</p>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800 block">
+            Órgano Interno de Control · Instituto de Justicia Alternativa de Jalisco
+          </span>
+          <h1 class="font-bold text-lg text-slate-900 leading-tight">Sistema de Denuncias a Distancia</h1>
+          <p class="text-xs text-slate-500">Contra Personas Servidoras Públicas del IJA · Resguardo Criptográfico SHA-256</p>
         </div>
       </div>
 
@@ -39,10 +41,10 @@
           T Texto: Normal
         </button>
         <button onclick="window.print()" id="btn-pdf" class="hidden px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-sm font-semibold">
-          Exportar Acta PDF
+          Exportar Constancia PDF
         </button>
         <button onclick="abrirModalVideo()" id="btn-video-top" class="hidden px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-semibold">
-          Videollamada
+          Ratificación por Video
         </button>
         <button onclick="cerrarSesion()" id="btn-salir" class="hidden px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 text-sm font-semibold">
           Salir
@@ -56,18 +58,12 @@
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
       <div class="bg-slate-900 text-white p-6">
         <span class="inline-block px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold mb-2">
-          Acceso Preferente · Adultos Mayores y Movilidad Reducida
+          Órgano Interno de Control (OIC) · Atención Accesible e Incluyente
         </span>
-        <h2 class="text-2xl font-bold">Comparecencia y Mediación a Distancia</h2>
-        <p class="text-slate-300 text-sm mt-1">Inicie su trámite sin trasladarse o ingrese como Prestador de Servicio del IJA.</p>
-      </div>
-
-      <!-- Acceso Rápido de Demostración para Abogado IJA -->
-      <div class="bg-amber-50 border-b border-amber-200 px-6 py-3 flex flex-wrap items-center justify-between gap-2">
-        <span class="text-xs font-semibold text-amber-900">¿Presentación institucional? Acceso inmediato a Mesa Jurídica:</span>
-        <button onclick="accesoDirectoAbogado()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-sm">
-          Entrar como Abogado / Prestador IJA →
-        </button>
+        <h2 class="text-2xl font-bold">Denuncias a Distancia contra Personas Servidoras Públicas del IJA</h2>
+        <p class="text-slate-300 text-sm mt-1">
+          Presente su queja o denuncia desde cualquier lugar sin necesidad de acudir presencialmente, con apoyo para personas adultas mayores, con movilidad reducida, requerimiento de intérprete/traductor o residencia fuera de la ciudad.
+        </p>
       </div>
 
       <div class="p-6">
@@ -76,11 +72,11 @@
             Iniciar Sesión
           </button>
           <button id="tab-registro" onclick="cambiarTabAuth('registro')" class="py-2.5 rounded-lg font-bold text-sm text-slate-600">
-            Crear Cuenta Nueva
+            Presentar Nueva Denuncia
           </button>
         </div>
 
-        <!-- Formulario Login -->
+        <!-- Formulario Login (Ciudadanos y Cuenta Única OIC) -->
         <form id="form-login" onsubmit="enviarLogin(event)" class="space-y-4">
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-1">Correo electrónico</label>
@@ -91,49 +87,31 @@
             <input type="password" id="login-pass" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none" />
           </div>
           <p class="text-xs text-slate-500">
-            Al ingresar, usted acepta los <button type="button" onclick="abrirModalLegal('terminos')" class="underline font-semibold text-slate-700">Términos y Condiciones</button> y el <button type="button" onclick="abrirModalLegal('privacidad')" class="underline font-semibold text-slate-700">Aviso de Privacidad Integral</button>.
+            Al ingresar, usted acepta los <button type="button" onclick="abrirModalLegal('terminos')" class="underline font-semibold text-slate-700">Términos y Condiciones de Denuncia</button> y el <button type="button" onclick="abrirModalLegal('privacidad')" class="underline font-semibold text-slate-700">Aviso de Privacidad Integral del OIC</button>.
           </p>
           <button type="submit" class="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-base shadow">
-            Ingresar a la Plataforma
+            Ingresar al Sistema
           </button>
         </form>
 
-        <!-- Formulario Registro -->
+        <!-- Formulario Registro Ciudadano -->
         <form id="form-registro" onsubmit="enviarRegistro(event)" class="hidden space-y-4">
           <div>
-            <label class="block text-sm font-bold text-slate-700 mb-1">Tipo de perfil</label>
-            <select id="reg-rol" onchange="alternarCamposRol()" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white font-semibold">
-              <option value="ciudadano">Solicitante (Adulto Mayor / Movilidad Reducida)</option>
-              <option value="abogado">Prestador de Servicio / Abogado Certificado IJA</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-1">Nombre completo</label>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Nombre completo de la persona denunciante</label>
             <input type="text" id="reg-nombre" required placeholder="Nombre(s) y apellidos" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
           </div>
-          <div id="bloque-datos-ciudadano" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-bold text-slate-700 mb-1">Edad</label>
-              <input type="number" id="reg-edad" value="68" min="18" max="115" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
+              <input type="number" id="reg-edad" required value="45" min="18" max="115" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
             </div>
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1">Municipio (Jalisco)</label>
-              <select id="reg-municipio" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white">
-                <option>Guadalajara</option>
-                <option>Zapopan</option>
-                <option>San Pedro Tlaquepaque</option>
-                <option>Tonalá</option>
-                <option>Tlajomulco de Zúñiga</option>
-                <option>Puerto Vallarta</option>
-                <option>Lagos de Moreno</option>
-                <option>Tepatitlán de Morelos</option>
-                <option>Ciudad Guzmán (Zapotlán el Grande)</option>
-                <option>Ocotlán</option>
-              </select>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Municipio o Lugar de Residencia</label>
+              <input type="text" id="reg-municipio" required placeholder="Ej. Guadalajara, Puerto Vallarta, Otro estado..." value="Guadalajara" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
             </div>
           </div>
           <div>
-            <label class="block text-sm font-bold text-slate-700 mb-1">Correo electrónico</label>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Correo electrónico para seguimiento</label>
             <input type="email" id="reg-email" required placeholder="correo@ejemplo.com" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
           </div>
           <div>
@@ -143,46 +121,46 @@
 
           <!-- Bloque Legal: Términos y Condiciones + Aviso de Privacidad Integral -->
           <div class="p-4 rounded-xl bg-slate-50 border border-slate-300 text-xs text-slate-700 space-y-2.5">
-            <p class="font-bold text-slate-900">Consentimiento Legal y Protección de Datos Personales</p>
+            <p class="font-bold text-slate-900">Consentimiento Legal y Protección de Datos de la Persona Denunciante</p>
             <label class="flex items-start gap-2 cursor-pointer">
               <input type="checkbox" id="reg-terminos" required class="mt-0.5 w-4 h-4 accent-slate-900" />
               <span>
-                He leído y acepto los <button type="button" onclick="abrirModalLegal('terminos')" class="underline font-bold text-amber-800">Términos y Condiciones de Uso y Confidencialidad</button> de los Métodos Alternos a Distancia del IJA Jalisco.
+                He leído y acepto los <button type="button" onclick="abrirModalLegal('terminos')" class="underline font-bold text-amber-800">Términos y Condiciones de Presentación de Denuncias a Distancia</button> ante el Órgano Interno de Control del IJA Jalisco.
               </span>
             </label>
             <label class="flex items-start gap-2 cursor-pointer">
               <input type="checkbox" id="reg-privacidad" required class="mt-0.5 w-4 h-4 accent-slate-900" />
               <span>
-                Consiento el tratamiento de mis datos personales y evidencias digitales conforme al <button type="button" onclick="abrirModalLegal('privacidad')" class="underline font-bold text-amber-800">Aviso de Privacidad Integral</button> (LPDPPSOEJM).
+                Consiento el tratamiento confidencial de mis datos personales y pruebas conforme al <button type="button" onclick="abrirModalLegal('privacidad')" class="underline font-bold text-amber-800">Aviso de Privacidad Integral del OIC</button>.
               </span>
             </label>
           </div>
 
           <button type="submit" class="w-full py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-base shadow">
-            Registrar Cuenta y Generar Folio
+            Crear Cuenta y Generar Folio de Denuncia
           </button>
         </form>
       </div>
     </div>
   </main>
 
-  <!-- PANEL DEL CIUDADANO -->
+  <!-- PANEL DE LA PERSONA DENUNCIANTE -->
   <section id="vista-ciudadano" class="hidden flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6">
     <div class="bg-slate-900 text-white rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow">
       <div>
-        <span class="text-xs uppercase tracking-wider text-amber-400 font-bold">Folio Oficial Asignado</span>
-        <h2 id="ciu-folio" class="text-2xl font-extrabold mt-0.5">IJA-JAL-2026-0001</h2>
-        <p id="ciu-bienvenida" class="text-slate-300 text-sm mt-1">Solicitante</p>
+        <span class="text-xs uppercase tracking-wider text-amber-400 font-bold">Folio Oficial de Denuncia OIC</span>
+        <h2 id="ciu-folio" class="text-2xl font-extrabold mt-0.5">OIC-IJA-2026-0001</h2>
+        <p id="ciu-bienvenida" class="text-slate-300 text-sm mt-1">Denunciante</p>
       </div>
       <button onclick="abrirModalVideo()" class="px-5 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg no-imprimir">
-        Iniciar videollamada grabada
+        Grabar comparecencia / ratificación
       </button>
     </div>
 
     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
-        <h3 class="text-lg font-bold text-slate-900">Datos de la Solicitud</h3>
-        <span id="ciu-estatus" class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">En revisión por abogado</span>
+        <h3 class="text-lg font-bold text-slate-900">Datos de la Denuncia contra Persona Servidora Pública del IJA</h3>
+        <span id="ciu-estatus" class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">Denuncia recibida por el OIC</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,163 +169,166 @@
           <input type="tel" id="campo-telefono" placeholder="Ej. 33 1234 5678" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
         </div>
         <div>
-          <label class="block text-sm font-bold text-slate-700 mb-1">Motivo de imposibilidad de traslado</label>
+          <label class="block text-sm font-bold text-slate-700 mb-1">Condición de atención a distancia / accesibilidad</label>
           <select id="campo-movilidad" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white">
-            <option>Movilidad reducida</option>
-            <option>Condición médica</option>
-            <option>Sin transporte / acompañante</option>
-            <option>Distancia geográfica</option>
+            <option>Persona adulta mayor (Tercera edad)</option>
+            <option>Persona con movilidad reducida o discapacidad</option>
+            <option>Requiere intérprete o traductor (Lengua indígena / señas / idioma)</option>
+            <option>Reside fuera de la ciudad o en otro municipio/estado</option>
+            <option>Otro motivo / Denuncia ciudadana general</option>
           </select>
         </div>
       </div>
 
       <div>
-        <label class="block text-sm font-bold text-slate-700 mb-1">Materia legal del asunto</label>
+        <label class="block text-sm font-bold text-slate-700 mb-1">Tipo de presunta falta administrativa o irregularidad</label>
         <select id="campo-materia" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white">
-          <option>Materia Familiar (Alimentos, cuidados, convivencia, sucesiones)</option>
-          <option>Materia Civil (Arrendamiento, posesión, contratos, daños)</option>
-          <option>Materia Mercantil (Pagarés, adeudos comerciales)</option>
-          <option>Materia Penal (Delitos de querella, abuso de confianza, despojo sin violencia)</option>
-          <option>Materia Comunitaria y Vecinal (Conflictos vecinales, condominios)</option>
+          <option>Abuso de funciones o trato indigno por servidor público del IJA</option>
+          <option>Negativa o dilación injustificada en la prestación del servicio</option>
+          <option>Cohecho, solicitud de dádivas o cobros indebidos</option>
+          <option>Conflicto de interés o parcialidad de persona mediadora/prestadora</option>
+          <option>Violación a la confidencialidad o manejo indebido de expediente</option>
+          <option>Otra conducta irregular de persona servidora pública del IJA</option>
         </select>
       </div>
 
       <div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-          <label class="text-sm font-bold text-slate-700">Relato de los hechos</label>
+          <label class="text-sm font-bold text-slate-700">Narración de los hechos (qué ocurrió, cuándo y en qué sede o área del IJA)</label>
           <button type="button" id="btn-dictado" onclick="alternarDictadoVoz()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-300 no-imprimir">
-            🎙 <span id="etiqueta-dictado">Dictar con voz</span>
+            🎙 <span id="etiqueta-dictado">Dictar denuncia por voz</span>
           </button>
         </div>
-        <textarea id="campo-relato" rows="4" placeholder="Describa brevemente su situación o presione Dictar con voz..." class="w-full px-4 py-3 rounded-xl border border-slate-300"></textarea>
+        <textarea id="campo-relato" rows="4" placeholder="Describa detalladamente los hechos cometidos por la persona servidora pública del IJA..." class="w-full px-4 py-3 rounded-xl border border-slate-300"></textarea>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-bold text-slate-700 mb-1">Persona invitada / contraparte</label>
-          <input type="text" id="campo-contraparte" placeholder="Nombre de la otra persona involucrada" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
+          <label class="block text-sm font-bold text-slate-700 mb-1">Nombre y/o cargo de la persona servidora pública denunciada</label>
+          <input type="text" id="campo-contraparte" placeholder="Nombre, cargo o área dentro del IJA (si lo conoce)" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
         </div>
         <div class="no-imprimir">
-          <label class="block text-sm font-bold text-slate-700 mb-1">Adjuntar identificación o prueba (PDF, JPG, PNG · Máx. 25MB)</label>
-          <input type="file" id="campo-archivo" accept=".pdf,.jpg,.jpeg,.png,.webm,.mp4" onchange="subirArchivoPrueba(this)" class="w-full text-sm text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800" />
+          <label class="block text-sm font-bold text-slate-700 mb-1">Adjuntar pruebas (Documentos, audios, capturas, PDF · Máx. 25MB)</label>
+          <input type="file" id="campo-archivo" accept=".pdf,.jpg,.jpeg,.png,.webm,.mp4,.mp3,.wav" onchange="subirArchivoPrueba(this)" class="w-full text-sm text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800" />
         </div>
       </div>
 
       <button onclick="guardarSolicitudCiudadano()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow no-imprimir">
-        Guardar en servidor
+        Enviar / Actualizar Denuncia al OIC
       </button>
     </div>
 
-    <!-- Acta y Firma -->
+    <!-- Acuerdo / Constancia del OIC y Firma -->
     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <h3 class="text-lg font-bold text-slate-900">Acta Redactada por el Abogado</h3>
+        <h3 class="text-lg font-bold text-slate-900">Acuerdo de Radicación / Acta del Órgano Interno de Control</h3>
         <button onclick="firmarActaCiudadano()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold no-imprimir">
-          Firmar de conformidad
+          Ratificar y firmar electrónicamente
         </button>
       </div>
       <div id="ciu-acta-texto" class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm whitespace-pre-wrap text-slate-700">
-        En espera de redacción por el abogado.
+        En espera de acuerdo de radicación por parte del Órgano Interno de Control del IJA.
       </div>
       <div id="ciu-firma-box" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">
-        ✓ Acta firmada electrónicamente por el solicitante.
+        ✓ Denuncia ratificada y firmada electrónicamente por la persona denunciante.
       </div>
     </div>
 
     <!-- Bóveda SHA-256 -->
     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
-      <h3 class="text-lg font-bold text-slate-900">Bóveda de Pruebas Certificadas (SHA-256)</h3>
-      <div id="ciu-lista-pruebas" class="space-y-2 text-sm text-slate-600">Sin archivos cargados aún.</div>
+      <h3 class="text-lg font-bold text-slate-900">Bóveda de Pruebas y Evidencias Certificadas (SHA-256)</h3>
+      <div id="ciu-lista-pruebas" class="space-y-2 text-sm text-slate-600">Sin pruebas cargadas aún.</div>
     </div>
 
-    <!-- Chat con Abogado -->
+    <!-- Chat con el OIC -->
     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3 no-imprimir">
-      <h3 class="text-lg font-bold text-slate-900">Mensajes con el Abogado</h3>
+      <h3 class="text-lg font-bold text-slate-900">Comunicación Directa con el Órgano Interno de Control (OIC)</h3>
       <div id="ciu-chat" class="max-h-60 overflow-y-auto space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200 text-sm"></div>
       <div class="flex gap-2">
-        <input type="text" id="ciu-msg-input" placeholder="Escriba su consulta..." class="flex-1 px-4 py-3 rounded-xl border border-slate-300" />
+        <input type="text" id="ciu-msg-input" placeholder="Escriba información adicional o solicite apoyo de traductor..." class="flex-1 px-4 py-3 rounded-xl border border-slate-300" />
         <button onclick="enviarMensaje('ciu-msg-input')" class="px-5 py-3 rounded-xl bg-slate-900 text-white font-bold">Enviar</button>
       </div>
     </div>
   </section>
 
-  <!-- PANEL DEL ABOGADO / PRESTADOR DE SERVICIO IJA -->
+  <!-- PANEL EXCLUSIVO DEL ÓRGANO INTERNO DE CONTROL (OIC) -->
   <section id="vista-abogado" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Lista de Expedientes -->
+      <!-- Bandeja de Denuncias Recibidas -->
       <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3 no-imprimir">
         <div class="flex items-center justify-between border-b pb-3">
-          <h2 class="font-bold text-slate-900">Expedientes Asignados</h2>
+          <h2 class="font-bold text-slate-900">Bandeja de Denuncias OIC</h2>
           <button onclick="cargarExpedientes()" class="text-xs font-bold text-amber-700 hover:underline">Actualizar</button>
         </div>
         <div id="abo-lista-expedientes" class="space-y-2"></div>
       </div>
 
-      <!-- Mesa Jurídica del Expediente Seleccionado -->
+      <!-- Mesa de Investigación del OIC -->
       <div class="lg:col-span-2 space-y-6">
         <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
             <div>
-              <span id="abo-folio" class="text-xs font-bold text-amber-700 uppercase">Seleccione un expediente</span>
+              <span id="abo-folio" class="text-xs font-bold text-amber-700 uppercase">Seleccione una denuncia</span>
               <h3 id="abo-ciudadano" class="text-xl font-bold text-slate-900">—</h3>
               <p id="abo-meta" class="text-xs text-slate-500 mt-0.5">—</p>
             </div>
             <button onclick="abrirModalVideo()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold no-imprimir">
-              Sala de Comparecencia
+              Audiencia de Ratificación
             </button>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm space-y-1">
-            <p><strong>Materia:</strong> <span id="abo-materia">—</span></p>
-            <p><strong>Contraparte:</strong> <span id="abo-contraparte">—</span></p>
-            <p><strong>Relato del ciudadano:</strong> <span id="abo-relato">—</span></p>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm space-y-1.5">
+            <p><strong>Presunta falta administrativa:</strong> <span id="abo-materia">—</span></p>
+            <p><strong>Persona servidora pública denunciada:</strong> <span id="abo-contraparte">—</span></p>
+            <p><strong>Hechos denunciados:</strong> <span id="abo-relato">—</span></p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 no-imprimir">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Estatus del trámite</label>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Estatus de investigación OIC</label>
               <select id="abo-estatus" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold">
-                <option>En revisión por abogado</option>
-                <option>Invitación enviada a contraparte</option>
-                <option>Audiencia remota programada</option>
-                <option>Convenio firmado y concluido</option>
+                <option>Denuncia recibida por el OIC</option>
+                <option>En etapa de investigación preliminar</option>
+                <option>Citada para ratificación remota / intérprete</option>
+                <option>Informe de Presunta Responsabilidad (IPRA)</option>
+                <option>Concluida / Archivo por falta de elementos</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Fecha / Sala de cita virtual</label>
-              <input type="text" id="abo-cita" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm" />
+              <label class="block text-xs font-bold text-slate-700 mb-1">Fecha / Sala de ratificación virtual</label>
+              <input type="text" id="abo-cita" placeholder="Ej. 25 Nov 2026 · 11:00 hrs · Sala OIC" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm" />
             </div>
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-sm font-bold text-slate-700">Redacción de Acta / Convenio IJA</label>
+              <label class="text-sm font-bold text-slate-700">Acuerdo de Radicación / Constancia de Ratificación OIC</label>
               <button onclick="insertarPlantillaActa()" class="px-3 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold no-imprimir">
-                Cargar formato oficial IJA
+                Cargar formato oficial OIC
               </button>
             </div>
-            <textarea id="abo-acta" rows="8" placeholder="Redacte aquí el acta de comparecencia o convenio..." class="w-full px-4 py-3 rounded-xl border border-slate-300 font-mono text-xs"></textarea>
+            <textarea id="abo-acta" rows="8" placeholder="Redacte aquí el acuerdo de radicación o constancia de denuncia..." class="w-full px-4 py-3 rounded-xl border border-slate-300 font-mono text-xs"></textarea>
           </div>
 
           <div id="abo-firma-estado" class="text-xs font-bold text-slate-500"></div>
 
           <button onclick="guardarGestionAbogado()" class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm no-imprimir">
-            Guardar acta y estatus en servidor
+            Guardar acuerdo y estatus en expediente
           </button>
         </div>
 
-        <!-- Bóveda SHA-256 Vista Abogado -->
+        <!-- Bóveda SHA-256 Vista OIC -->
         <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
-          <h4 class="font-bold text-slate-900">Evidencias y Videos en Bóveda (SHA-256)</h4>
+          <h4 class="font-bold text-slate-900">Evidencias y Ratificaciones en Bóveda (SHA-256)</h4>
           <div id="abo-lista-pruebas" class="space-y-2 text-sm text-slate-600">Sin pruebas adjuntas.</div>
         </div>
 
-        <!-- Chat Vista Abogado -->
+        <!-- Chat Vista OIC -->
         <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3 no-imprimir">
-          <h4 class="font-bold text-slate-900">Comunicación con el Solicitante</h4>
+          <h4 class="font-bold text-slate-900">Notificaciones y Seguimiento con la Persona Denunciante</h4>
           <div id="abo-chat" class="max-h-52 overflow-y-auto space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200 text-sm"></div>
           <div class="flex gap-2">
-            <input type="text" id="abo-msg-input" placeholder="Escriba indicaciones al ciudadano..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm" />
+            <input type="text" id="abo-msg-input" placeholder="Escriba requerimientos o aviso de recepción al denunciante..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm" />
             <button onclick="enviarMensaje('abo-msg-input')" class="px-5 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-sm">Enviar</button>
           </div>
         </div>
@@ -359,19 +340,19 @@
   <div id="modal-video" class="hidden fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 no-imprimir">
     <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl">
       <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
-        <h3 class="font-bold">Sala de Comparecencia Remota · Grabación SHA-256</h3>
+        <h3 class="font-bold">Sala de Ratificación Remota OIC · Grabación SHA-256</h3>
         <button onclick="cerrarModalVideo()" class="text-slate-300 hover:text-white font-bold text-lg">✕</button>
       </div>
       <div class="p-6 space-y-4">
         <video id="video-preview" autoplay muted playsinline class="w-full h-72 bg-black rounded-xl object-cover"></video>
         <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950">
-          <strong>Aviso de Confidencialidad de Sesión:</strong> La grabación de esta comparecencia es confidencial conforme al artículo 7 de la Ley de Justicia Alternativa del Estado de Jalisco y queda resguardada bajo sello criptográfico SHA-256 únicamente como constancia procedimental.
+          <strong>Reserva y Protección de Identidad:</strong> Esta grabación forma parte exclusiva de la carpeta de investigación administrativa del Órgano Interno de Control del IJA Jalisco bajo sello criptográfico SHA-256.
         </div>
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <span id="video-estado" class="text-xs font-bold text-slate-600">Cámara lista para comparecencia.</span>
+          <span id="video-estado" class="text-xs font-bold text-slate-600">Cámara lista para ratificación.</span>
           <div class="flex gap-2">
             <button id="btn-iniciar-grab" onclick="iniciarGrabacionVideo()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold">
-              ● Aceptar y grabar en bóveda
+              ● Grabar ratificación en bóveda
             </button>
             <button id="btn-detener-grab" onclick="detenerGrabacionVideo()" class="hidden px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold">
               ■ Detener y guardar video
@@ -399,14 +380,14 @@
   <!-- PIE DE PÁGINA INSTITUCIONAL -->
   <footer class="bg-white border-t border-slate-200 mt-12 py-6 px-4 text-center text-xs text-slate-500">
     <div class="flex flex-wrap justify-center gap-4 mb-2 font-bold text-slate-700 no-imprimir">
-      <button onclick="abrirModalLegal('terminos')" class="hover:underline">Términos y Condiciones de Uso</button>
+      <button onclick="abrirModalLegal('terminos')" class="hover:underline">Términos y Condiciones de Denuncia</button>
       <span>·</span>
-      <button onclick="abrirModalLegal('privacidad')" class="hover:underline">Aviso de Privacidad Integral (ITEI Jalisco)</button>
+      <button onclick="abrirModalLegal('privacidad')" class="hover:underline">Aviso de Privacidad Integral (OIC - IJA)</button>
       <span>·</span>
-      <button onclick="abrirModalLegal('seguridad')" class="hover:underline">Política de Seguridad y Cadena de Custodia SHA-256</button>
+      <button onclick="abrirModalLegal('seguridad')" class="hover:underline">Cadena de Custodia Digital SHA-256</button>
     </div>
-    <p class="font-bold text-slate-700">© 2026 Sistema de Atención Remota y Comparecencia Preferente · Todos los derechos reservados.</p>
-    <p class="mt-1">Desarrollado para el Instituto de Justicia Alternativa del Estado de Jalisco. Resguardo sujeto a la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Jalisco y sus Municipios.</p>
+    <p class="font-bold text-slate-700">© 2026 Órgano Interno de Control del Instituto de Justicia Alternativa del Estado de Jalisco.</p>
+    <p class="mt-1">Sistema exclusivo para la recepción y seguimiento a distancia de denuncias por presuntas faltas administrativas de personas servidoras públicas del IJA.</p>
   </footer>
 
   <script>
@@ -420,30 +401,29 @@
 
     const TEXTOS_LEGALES = {
       terminos: {
-        titulo: 'Términos y Condiciones de Uso · Plataforma Remota IJA Jalisco',
+        titulo: 'Términos y Condiciones de Uso · Denuncias a Distancia (OIC - IJA Jalisco)',
         html: `
-          <p><strong>1. Objeto y Naturaleza del Servicio:</strong> La presente plataforma facilita el acceso preferente a los Métodos Alternos de Solución de Conflictos (mediación, conciliación y negociación asistida) a distancia para adultos mayores y personas con movilidad reducida en el Estado de Jalisco, en términos de la <em>Ley de Justicia Alternativa del Estado de Jalisco</em>.</p>
-          <p><strong>2. Principio de Voluntariedad y Buena Fe:</strong> El uso de la plataforma es estrictamente voluntario. El solicitante declara bajo protesta de decir verdad que los datos y documentos digitales aportados son auténticos y corresponden al asunto planteado.</p>
-          <p><strong>3. Confidencialidad Absoluta:</strong> De conformidad con los artículos 7 y 49 de la Ley de Justicia Alternativa del Estado de Jalisco, toda información verbal, escrita o audiovisual vertida durante el trámite es estrictamente confidencial y no podrá ser divulgada, grabada por terceros ni utilizada en perjuicio de las partes en juicio diverso.</p>
-          <p><strong>4. Validez de Actuaciones Remotas:</strong> Las comparecencias por videoconferencia, la aceptación electrónica de actas y los registros con huella criptográfica SHA-256 constituyen constancias administrativas válidas dentro del expediente electrónico institucional.</p>
+          <p><strong>1. Competencia Exclusiva del Órgano Interno de Control (OIC):</strong> Esta plataforma es operada exclusivamente por el Órgano Interno de Control del Instituto de Justicia Alternativa del Estado de Jalisco (IJA) para recibir, radicar e investigar quejas y denuncias por presuntas faltas administrativas cometidas únicamente por <strong>personas servidoras públicas adscritas al IJA</strong>, en términos de la <em>Ley General de Responsabilidades Administrativas</em> y la <em>Ley de Responsabilidades Políticas y Administrativas del Estado de Jalisco</em>.</p>
+          <p><strong>2. Incompetencia sobre Conflictos entre Particulares:</strong> Este canal no tramita mediaciones ni conflictos entre particulares; cualquier asunto ajeno a la conducta de servidores públicos del IJA será orientado a las áreas correspondientes.</p>
+          <p><strong>3. Accesibilidad Universal y No Discriminación:</strong> Cualquier persona puede presentar denuncia a distancia, garantizando ajustes razonables y atención preferente a personas adultas mayores, personas con movilidad reducida, personas que requieran intérprete o traductor, o quienes residan fuera del Área Metropolitana de Guadalajara.</p>
+          <p><strong>4. Veracidad y Buena Fe:</strong> La persona denunciante manifiesta que los hechos narrados y evidencias aportadas son verídicos y se compromete a conducir su participación con respeto y buena fe procedimental.</p>
+          <p><strong>5. Validez de Actuaciones Electrónicas:</strong> Las constancias, ratificaciones por video y documentos con sello criptográfico SHA-256 tienen plena validez administrativa dentro del expediente de investigación del OIC.</p>
         `
       },
       privacidad: {
-        titulo: 'Aviso de Privacidad Integral · Instituto de Justicia Alternativa (Jalisco)',
+        titulo: 'Aviso de Privacidad Integral · Órgano Interno de Control del IJA Jalisco',
         html: `
-          <p><strong>1. Responsable del Tratamiento:</strong> El Instituto de Justicia Alternativa del Estado de Jalisco (IJA), con domicilio en Av. Enrique Díaz de León Norte #316, Col. Villaseñor, C.P. 44600, Guadalajara, Jalisco, es responsable del uso y protección de sus datos personales.</p>
-          <p><strong>2. Datos Personales Recabados:</strong> Nombre completo, edad, municipio de residencia, teléfono, correo electrónico, condición de movilidad o salud (datos personales sensibles para acreditar atención preferente), narración de hechos, identificaciones oficiales, voz e imagen durante la comparecencia remota.</p>
-          <p><strong>3. Finalidades Primarias:</strong> Integrar el expediente electrónico, acreditar la identidad de las partes, girar invitaciones a los mediados, celebrar sesiones a distancia y elaborar convenios o actas conclusivas.</p>
-          <p><strong>4. Transferencia de Datos:</strong> Sus datos personales no serán transferidos a terceros, salvo requerimientos fundados y motivados de autoridad jurisdiccional o ministerial competente, conforme a la <em>Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Jalisco y sus Municipios</em>.</p>
-          <p><strong>5. Derechos ARCO:</strong> Usted podrá ejercer sus derechos de Acceso, Rectificación, Cancelación u Oposición (ARCO) directamente ante la Unidad de Transparencia del IJA Jalisco o a través de la Plataforma Nacional de Transparencia.</p>
+          <p><strong>1. Responsable del Tratamiento:</strong> El Órgano Interno de Control del Instituto de Justicia Alternativa del Estado de Jalisco (OIC-IJA), con domicilio en Av. Enrique Díaz de León Norte #316, Col. Villaseñor, C.P. 44600, Guadalajara, Jalisco.</p>
+          <p><strong>2. Datos Personales Recabados:</strong> Nombre completo, edad, municipio o lugar de residencia, teléfono, correo electrónico, condición de accesibilidad (movilidad reducida, requerimiento de intérprete/traductor), narración de hechos, evidencias digitales, voz e imagen de ratificación.</p>
+          <p><strong>3. Finalidades y Reserva de Identidad:</strong> Integrar el expediente de investigación administrativa, garantizar la protección de la identidad de la persona denunciante y notificarte el avance o resolución conforme a la <em>Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Jalisco y sus Municipios</em>.</p>
+          <p><strong>4. Derechos ARCO:</strong> Podrás ejercer tus derechos de Acceso, Rectificación, Cancelación u Oposición directamente ante la Unidad de Transparencia del IJA Jalisco.</p>
         `
       },
       seguridad: {
-        titulo: 'Política de Seguridad Informática y Cadena de Custodia SHA-256',
+        titulo: 'Cadena de Custodia Digital SHA-256 y Seguridad Informática',
         html: `
-          <p><strong>1. Cifrado e Integridad Probatoria (SHA-256):</strong> Todo documento o video de comparecencia ingresado a la bóveda genera automáticamente un resumen criptográfico único de 256 bits (SHA-256). Cualquier alteración posterior de un solo bit invalida la huella original.</p>
-          <p><strong>2. Control de Acceso y Trazabilidad:</strong> El sistema opera con tokens de sesión firmados (JWT), bloqueo automático ante intentos de intrusión por fuerza bruta, cabeceras HTTP anti-secuestro de sesión y bitácora permanente de auditoría con registro de IP y marca de tiempo.</p>
-          <p><strong>3. Soberanía de Datos Institucionales:</strong> La infraestructura está diseñada para operar directamente en servidores propios del Instituto (<em>on-premise</em>) bajo protocolo seguro HTTPS/TLS.</p>
+          <p><strong>1. Integridad Probatoria (SHA-256):</strong> Cada prueba documental, captura o video de ratificación ingresado genera una huella criptográfica SHA-256 única que garantiza su inalterabilidad durante toda la investigación del OIC.</p>
+          <p><strong>2. Acceso Restringido:</strong> Únicamente la cuenta institucional autorizada del Órgano Interno de Control tiene acceso a la bandeja de denuncias recibidas, bajo cifrado HTTPS y bitácora permanente de auditoría.</p>
         `
       }
     };
@@ -474,36 +454,6 @@
       document.getElementById('tab-registro').className = !esLogin ? 'py-2.5 rounded-lg font-bold text-sm bg-white shadow text-slate-900' : 'py-2.5 rounded-lg font-bold text-sm text-slate-600';
     }
 
-    function alternarCamposRol() {
-      const rol = document.getElementById('reg-rol').value;
-      document.getElementById('bloque-datos-ciudadano').classList.toggle('hidden', rol === 'abogado');
-    }
-
-    async function accesoDirectoAbogado() {
-      const email = 'abogado@ija.gob.mx';
-      const password = 'ija2026';
-      let res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      if (!res.ok) {
-        res = await fetch('/api/auth/registro', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nombre: 'Lic. Prestador de Servicio IJA',
-            email,
-            password,
-            rol: 'abogado',
-            municipio: 'Guadalajara'
-          })
-        });
-      }
-      const data = await res.json();
-      if (data.token) guardarSesion(data.token, data.usuario);
-    }
-
     async function enviarLogin(e) {
       e.preventDefault();
       const res = await fetch('/api/auth/login', {
@@ -528,7 +478,6 @@
           nombre: document.getElementById('reg-nombre').value,
           email: document.getElementById('reg-email').value,
           password: document.getElementById('reg-pass').value,
-          rol: document.getElementById('reg-rol').value,
           edad: document.getElementById('reg-edad').value,
           municipio: document.getElementById('reg-municipio').value
         })
@@ -597,7 +546,7 @@
       if (exp.materia) document.getElementById('campo-materia').value = exp.materia;
       document.getElementById('campo-relato').value = exp.relato || '';
       document.getElementById('campo-contraparte').value = exp.contraparte || '';
-      document.getElementById('ciu-acta-texto').innerText = exp.acta_legal || 'En espera de redacción por el abogado.';
+      document.getElementById('ciu-acta-texto').innerText = exp.acta_legal || 'En espera de acuerdo de radicación por parte del Órgano Interno de Control del IJA.';
       document.getElementById('ciu-firma-box').classList.toggle('hidden', !exp.firma_base64);
 
       renderPruebas('ciu-lista-pruebas', exp.pruebas || []);
@@ -607,12 +556,12 @@
     function renderListaAbogado() {
       const cont = document.getElementById('abo-lista-expedientes');
       if (!expedientesCache.length) {
-        cont.innerHTML = '<p class="text-xs text-slate-500">No hay solicitudes registradas aún.</p>';
+        cont.innerHTML = '<p class="text-xs text-slate-500">No hay denuncias registradas aún.</p>';
         return;
       }
       cont.innerHTML = expedientesCache.map(exp => `
         <button onclick="seleccionarExpedienteAbogado(${exp.id})" class="w-full text-left p-3 rounded-xl border ${expedienteActivo && expedienteActivo.id === exp.id ? 'border-amber-500 bg-amber-50' : 'border-slate-200 hover:bg-slate-50'}">
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-center gap-1">
             <span class="text-xs font-bold text-amber-800">${exp.folio}</span>
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 font-semibold">${exp.estatus}</span>
           </div>
@@ -629,16 +578,16 @@
 
       document.getElementById('abo-folio').innerText = expedienteActivo.folio;
       document.getElementById('abo-ciudadano').innerText = expedienteActivo.ciudadano_nombre;
-      document.getElementById('abo-meta').innerText = `Edad: ${expedienteActivo.edad || 'N/D'} · Municipio: ${expedienteActivo.municipio || 'Jalisco'} · Tel: ${expedienteActivo.telefono || 'Sin teléfono'} · Motivo: ${expedienteActivo.movilidad || 'Preferente'}`;
+      document.getElementById('abo-meta').innerText = `Edad: ${expedienteActivo.edad || 'N/D'} · Residencia: ${expedienteActivo.municipio || 'N/D'} · Tel: ${expedienteActivo.telefono || 'Sin teléfono'} · Accesibilidad: ${expedienteActivo.movilidad || 'General'}`;
       document.getElementById('abo-materia').innerText = expedienteActivo.materia || 'Sin especificar';
       document.getElementById('abo-contraparte').innerText = expedienteActivo.contraparte || 'Sin especificar';
-      document.getElementById('abo-relato').innerText = expedienteActivo.relato || 'Sin relato aún';
+      document.getElementById('abo-relato').innerText = expedienteActivo.relato || 'Sin narración de hechos aún';
       document.getElementById('abo-estatus').value = expedienteActivo.estatus;
       document.getElementById('abo-cita').value = expedienteActivo.cita || '';
       document.getElementById('abo-acta').value = expedienteActivo.acta_legal || '';
       document.getElementById('abo-firma-estado').innerText = expedienteActivo.firma_base64
-        ? '✓ Firmado de conformidad por el solicitante.'
-        : 'Pendiente de firma electrónica por el ciudadano.';
+        ? '✓ Denuncia ratificada y firmada electrónicamente por la persona denunciante.'
+        : 'Pendiente de firma electrónica de ratificación por la persona denunciante.';
 
       renderPruebas('abo-lista-pruebas', expedienteActivo.pruebas || []);
       renderChat('abo-chat', expedienteActivo.mensajes || []);
@@ -647,7 +596,7 @@
     function renderPruebas(elementId, pruebas) {
       const el = document.getElementById(elementId);
       if (!pruebas.length) {
-        el.innerHTML = 'Sin archivos cargados aún.';
+        el.innerHTML = 'Sin pruebas cargadas aún.';
         return;
       }
       el.innerHTML = pruebas.map(p => `
@@ -666,11 +615,11 @@
     function renderChat(elementId, mensajes) {
       const el = document.getElementById(elementId);
       if (!mensajes.length) {
-        el.innerHTML = '<p class="text-xs text-slate-400">Sin mensajes en el expediente.</p>';
+        el.innerHTML = '<p class="text-xs text-slate-400">Sin notificaciones en el expediente.</p>';
         return;
       }
       el.innerHTML = mensajes.map(m => `
-        <div class="p-2.5 rounded-lg ${m.emisor_rol === 'abogado' ? 'bg-amber-100/70 border border-amber-200' : 'bg-white border border-slate-200'}">
+        <div class="p-2.5 rounded-lg ${m.emisor_rol.includes('Órgano') ? 'bg-amber-100/70 border border-amber-200' : 'bg-white border border-slate-200'}">
           <span class="text-xs font-bold">${m.autor_nombre} (${m.emisor_rol}):</span>
           <p class="text-slate-800 mt-0.5">${m.contenido}</p>
         </div>
@@ -691,7 +640,7 @@
         })
       });
       if (res.ok) {
-        alert('Solicitud guardada correctamente en el servidor.');
+        alert('Denuncia enviada y guardada correctamente para atención del Órgano Interno de Control.');
         await cargarExpedientes();
       }
     }
@@ -700,20 +649,21 @@
       if (!expedienteActivo) return;
       const fecha = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
       document.getElementById('abo-acta').value =
-`INSTITUTO DE JUSTICIA ALTERNATIVA DEL ESTADO DE JALISCO
-ACTA DE COMPARECENCIA Y SOLICITUD DE MÉTODO ALTERNO A DISTANCIA
+`ÓRGANO INTERNO DE CONTROL DEL INSTITUTO DE JUSTICIA ALTERNATIVA DEL ESTADO DE JALISCO
+ACUERDO DE RADICACIÓN DE DENUNCIA A DISTANCIA
 
-FOLIO OFICIAL: ${expedienteActivo.folio}
+EXPEDIENTE OIC: ${expedienteActivo.folio}
 FECHA: ${fecha}
-MUNICIPIO: ${expedienteActivo.municipio || 'Guadalajara'}, Jalisco.
+SEDE: Guadalajara, Jalisco.
 
-En atención preferente por ${expedienteActivo.movilidad || 'movilidad reducida'}, comparece vía remota el/la C. ${expedienteActivo.ciudadano_nombre}, manifestando su voluntad de iniciar trámite en ${expedienteActivo.materia || 'Materia Familiar'} respecto de los hechos narrados en su expediente, señalando como persona invitada a ${expedienteActivo.contraparte || 'la contraparte'}.
+VISTO el escrito electrónico presentado vía remota por el/la C. ${expedienteActivo.ciudadano_nombre}, bajo modalidad de atención accesible (${expedienteActivo.movilidad || 'Atención a distancia'}), mediante el cual formula denuncia por presuntas faltas administrativas atribuidas a ${expedienteActivo.contraparte || 'persona servidora pública adscrita al IJA'}, consistentes en: ${expedienteActivo.materia || 'Irregularidad administrativa'}.
 
-ACUERDOS Y SEGUIMIENTO:
-1. Se radica la solicitud y se resguardan las evidencias digitales en la bóveda institucional con sello criptográfico SHA-256.
-2. Se gira invitación formal para sesión de mediación/conciliación a distancia conforme a la Ley de Justicia Alternativa del Estado de Jalisco.
+SE ACUERDA:
+1. Téngase por recibida y radicada la denuncia a distancia con fundamento en la Ley General de Responsabilidades Administrativas y la Ley de Responsabilidades Políticas y Administrativas del Estado de Jalisco.
+2. Intégrense a la carpeta de investigación las pruebas digitales resguardadas en bóveda bajo sello criptográfico SHA-256.
+3. Notifíquese a la persona denunciante para efectos de ratificación electrónica o por videoconferencia y seguimiento procesal.
 
-Firma electrónica de conformidad del solicitante y validación del Prestador de Servicio Certificado.`;
+Validado por el Órgano Interno de Control del Instituto de Justicia Alternativa del Estado de Jalisco.`;
     }
 
     async function guardarGestionAbogado() {
@@ -728,21 +678,21 @@ Firma electrónica de conformidad del solicitante y validación del Prestador de
         })
       });
       if (res.ok) {
-        alert('Acta y estatus guardados en el expediente.');
+        alert('Acuerdo y estatus actualizados en el expediente del OIC.');
         await cargarExpedientes();
       }
     }
 
     async function firmarActaCiudadano() {
       if (!expedienteActivo) return;
-      const firma = `FIRMADO_DIGITALMENTE_${usuarioActual.nombre}_${new Date().toISOString()}`;
+      const firma = `RATIFICADO_FIRMADO_${usuarioActual.nombre}_${new Date().toISOString()}`;
       const res = await fetch(`/api/expedientes/${expedienteActivo.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ firma_base64: firma })
       });
       if (res.ok) {
-        alert('Firma electrónica estampada correctamente.');
+        alert('Denuncia ratificada y firmada electrónicamente.');
         await cargarExpedientes();
       }
     }
@@ -751,7 +701,7 @@ Firma electrónica de conformidad del solicitante y validación del Prestador de
       if (!input.files.length || !expedienteActivo) return;
       const formData = new FormData();
       formData.append('archivo', input.files[0]);
-      formData.append('tipo', 'Documento / Evidencia');
+      formData.append('tipo', 'Prueba OIC');
       const res = await fetch(`/api/expedientes/${expedienteActivo.id}/pruebas`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -759,7 +709,7 @@ Firma electrónica de conformidad del solicitante y validación del Prestador de
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Archivo certificado con SHA-256 y guardado en bóveda.');
+        alert('Evidencia certificada con SHA-256 y guardada en la bóveda del OIC.');
         input.value = '';
         await cargarExpedientes();
       } else {
@@ -834,7 +784,7 @@ Firma electrónica de conformidad del solicitante y validación del Prestador de
       reconocimientoVoz.onerror = (e) => alert(`Error de micrófono: ${e.error}`);
       reconocimientoVoz.onend = () => {
         dictandoActivo = false;
-        etiqueta.innerText = 'Dictar con voz';
+        etiqueta.innerText = 'Dictar denuncia por voz';
         btn.classList.remove('bg-red-600', 'text-white', 'animate-pulse');
         btn.classList.add('bg-slate-100', 'text-slate-800');
       };
@@ -869,8 +819,8 @@ Firma electrónica de conformidad del solicitante y validación del Prestador de
       mediaRecorder.onstop = async () => {
         const blob = new Blob(chunksVideo, { type: 'video/webm' });
         const formData = new FormData();
-        formData.append('archivo', blob, `comparecencia_${Date.now()}.webm`);
-        formData.append('tipo', 'Video Comparecencia');
+        formData.append('archivo', blob, `ratificacion_oic_${Date.now()}.webm`);
+        formData.append('tipo', 'Video Ratificación OIC');
         document.getElementById('video-estado').innerText = 'Certificando video con SHA-256...';
         const res = await fetch(`/api/expedientes/${expedienteActivo.id}/pruebas`, {
           method: 'POST',
@@ -885,7 +835,7 @@ Firma electrónica de conformidad del solicitante y validación del Prestador de
       mediaRecorder.start();
       document.getElementById('btn-iniciar-grab').classList.add('hidden');
       document.getElementById('btn-detener-grab').classList.remove('hidden');
-      document.getElementById('video-estado').innerText = '● Grabando comparecencia...';
+      document.getElementById('video-estado').innerText = '● Grabando ratificación...';
     }
 
     function detenerGrabacionVideo() {
