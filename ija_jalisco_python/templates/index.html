@@ -886,12 +886,12 @@ Validado por el Órgano Interno de Control del Instituto de Justicia Alternativa
       reconocimientoVoz.start();
     }
 
-    // Videollamada Bidireccional en Vivo por Folio
+  // Videollamada Bidireccional en Vivo por Folio (Sin registro ni inicio de sesión)
     function abrirModalVideo() {
       if (!expedienteActivo) return alert('Seleccione un expediente primero.');
-      const salaLimpia = `OIC_IJA_JALISCO_${expedienteActivo.folio.replace(/[^a-zA-Z0-9]/g, '_')}_SALA_SEGURA`;
+      const salaLimpia = `OIC_IJA_JALISCO_${expedienteActivo.folio.replace(/[^a-zA-Z0-9]/g, '_')}`;
       const nombreUsuario = encodeURIComponent(usuarioActual.nombre);
-      urlSalaActual = `https://meet.jit.si/${salaLimpia}#userInfo.displayName="${nombreUsuario}"&config.prejoinPageEnabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=false`;
+      urlSalaActual = `https://vdo.ninja/?room=${salaLimpia}&label=${nombreUsuario}&webcam&autostart&cleanoutput`;
 
       document.getElementById('video-sala-nombre').innerText = `Expediente: ${expedienteActivo.folio} · Conectado como: ${usuarioActual.nombre}`;
       document.getElementById('iframe-videollamada').src = urlSalaActual;
