@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IJA Jalisco | Plataforma de Atención Remota Preferente</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body.texto-grande { font-size: 1.2rem; }
+    body.texto-grande input, body.texto-grande select, body.texto-grande textarea, body.texto-grande button {
+      font-size: 1.15rem !important;
+      padding-top: 0.85rem !important;
+      padding-bottom: 0.85rem !important;
+    }
+    @media print {
+      .no-imprimir { display: none !important; }
+      body { background: #fff !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans">
+
+  <!-- Barra Superior Institucional -->
+  <header class="bg-white border-b-4 border-amber-500 shadow-sm sticky top-0 z-40 no-imprimir">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center font-bold text-xl shadow">
+          ⚖
+        </div>
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700 block">Gobierno del Estado de Jalisco</span>
+          <h1 class="font-bold text-lg text-slate-900 leading-tight">Instituto de Justicia Alternativa (IJA)</h1>
+          <p class="text-xs text-slate-500">Plataforma de Atención Remota Preferente · Cifrado SHA-256</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="alternarTamanoTexto()" id="btn-texto" class="px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-sm font-semibold">
+          T Texto: Normal
+        </button>
+        <button onclick="window.print()" id="btn-pdf" class="hidden px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-sm font-semibold">
+          Exportar Acta PDF
+        </button>
+        <button onclick="abrirModalVideo()" id="btn-video-top" class="hidden px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-semibold">
+          Videollamada
+        </button>
+        <button onclick="cerrarSesion()" id="btn-salir" class="hidden px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 text-sm font-semibold">
+          Salir
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PANTALLA DE ACCESO Y REGISTRO -->
+  <main id="vista-auth" class="flex-1 max-w-2xl w-full mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <div class="bg-slate-900 text-white p-6">
+        <span class="inline-block px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold mb-2">
+          Acceso Preferente · Adultos Mayores y Movilidad Reducida
+        </span>
+        <h2 class="text-2xl font-bold">Comparecencia y Mediación a Distancia</h2>
+        <p class="text-slate-300 text-sm mt-1">Inicie su trámite sin trasladarse o ingrese como Prestador de Servicio del IJA.</p>
+      </div>
+
+      <!-- Acceso Rápido de Demostración para Abogado IJA -->
+      <div class="bg-amber-50 border-b border-amber-200 px-6 py-3 flex flex-wrap items-center justify-between gap-2">
+        <span class="text-xs font-semibold text-amber-900">¿Presentación institucional? Acceso inmediato a Mesa Jurídica:</span>
+        <button onclick="accesoDirectoAbogado()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-sm">
+          Entrar como Abogado / Prestador IJA →
+        </button>
+      </div>
+
+      <div class="p-6">
+        <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl mb-6">
+          <button id="tab-login" onclick="cambiarTabAuth('login')" class="py-2.5 rounded-lg font-bold text-sm bg-white shadow text-slate-900">
+            Iniciar Sesión
+          </button>
+          <button id="tab-registro" onclick="cambiarTabAuth('registro')" class="py-2.5 rounded-lg font-bold text-sm text-slate-600">
+            Crear Cuenta Nueva
+          </button>
+        </div>
+
+        <!-- Formulario Login -->
+        <form id="form-login" onsubmit="enviarLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Correo electrónico</label>
+            <input type="email" id="login-email" required placeholder="ejemplo@correo.com" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Contraseña</label>
+            <input type="password" id="login-pass" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none" />
+          </div>
+          <p class="text-xs text-slate-500">
+            Al ingresar, usted acepta los <button type="button" onclick="abrirModalLegal('terminos')" class="underline font-semibold text-slate-700">Términos y Condiciones</button> y el <button type="button" onclick="abrirModalLegal('privacidad')" class="underline font-semibold text-slate-700">Aviso de Privacidad Integral</button>.
+          </p>
+          <button type="submit" class="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-base shadow">
+            Ingresar a la Plataforma
+          </button>
+        </form>
+
+        <!-- Formulario Registro -->
+        <form id="form-registro" onsubmit="enviarRegistro(event)" class="hidden space-y-4">
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Tipo de perfil</label>
+            <select id="reg-rol" onchange="alternarCamposRol()" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white font-semibold">
+              <option value="ciudadano">Solicitante (Adulto Mayor / Movilidad Reducida)</option>
+              <option value="abogado">Prestador de Servicio / Abogado Certificado IJA</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Nombre completo</label>
+            <input type="text" id="reg-nombre" required placeholder="Nombre(s) y apellidos" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
+          </div>
+          <div id="bloque-datos-ciudadano" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Edad</label>
+              <input type="number" id="reg-edad" value="68" min="18" max="115" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">Municipio (Jalisco)</label>
+              <select id="reg-municipio" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white">
+                <option>Guadalajara</option>
+                <option>Zapopan</option>
+                <option>San Pedro Tlaquepaque</option>
+                <option>Tonalá</option>
+                <option>Tlajomulco de Zúñiga</option>
+                <option>Puerto Vallarta</option>
+                <option>Lagos de Moreno</option>
+                <option>Tepatitlán de Morelos</option>
+                <option>Ciudad Guzmán (Zapotlán el Grande)</option>
+                <option>Ocotlán</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Correo electrónico</label>
+            <input type="email" id="reg-email" required placeholder="correo@ejemplo.com" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Contraseña (mínimo 6 caracteres)</label>
+            <input type="password" id="reg-pass" required minlength="6" placeholder="Cree una contraseña segura" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
+          </div>
+
+          <!-- Bloque Legal: Términos y Condiciones + Aviso de Privacidad Integral -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-300 text-xs text-slate-700 space-y-2.5">
+            <p class="font-bold text-slate-900">Consentimiento Legal y Protección de Datos Personales</p>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" id="reg-terminos" required class="mt-0.5 w-4 h-4 accent-slate-900" />
+              <span>
+                He leído y acepto los <button type="button" onclick="abrirModalLegal('terminos')" class="underline font-bold text-amber-800">Términos y Condiciones de Uso y Confidencialidad</button> de los Métodos Alternos a Distancia del IJA Jalisco.
+              </span>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" id="reg-privacidad" required class="mt-0.5 w-4 h-4 accent-slate-900" />
+              <span>
+                Consiento el tratamiento de mis datos personales y evidencias digitales conforme al <button type="button" onclick="abrirModalLegal('privacidad')" class="underline font-bold text-amber-800">Aviso de Privacidad Integral</button> (LPDPPSOEJM).
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-base shadow">
+            Registrar Cuenta y Generar Folio
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- PANEL DEL CIUDADANO -->
+  <section id="vista-ciudadano" class="hidden flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6">
+    <div class="bg-slate-900 text-white rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow">
+      <div>
+        <span class="text-xs uppercase tracking-wider text-amber-400 font-bold">Folio Oficial Asignado</span>
+        <h2 id="ciu-folio" class="text-2xl font-extrabold mt-0.5">IJA-JAL-2026-0001</h2>
+        <p id="ciu-bienvenida" class="text-slate-300 text-sm mt-1">Solicitante</p>
+      </div>
+      <button onclick="abrirModalVideo()" class="px-5 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg no-imprimir">
+        Iniciar videollamada grabada
+      </button>
+    </div>
+
+    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+        <h3 class="text-lg font-bold text-slate-900">Datos de la Solicitud</h3>
+        <span id="ciu-estatus" class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">En revisión por abogado</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">Teléfono de contacto</label>
+          <input type="tel" id="campo-telefono" placeholder="Ej. 33 1234 5678" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">Motivo de imposibilidad de traslado</label>
+          <select id="campo-movilidad" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white">
+            <option>Movilidad reducida</option>
+            <option>Condición médica</option>
+            <option>Sin transporte / acompañante</option>
+            <option>Distancia geográfica</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-bold text-slate-700 mb-1">Materia legal del asunto</label>
+        <select id="campo-materia" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white">
+          <option>Materia Familiar (Alimentos, cuidados, convivencia, sucesiones)</option>
+          <option>Materia Civil (Arrendamiento, posesión, contratos, daños)</option>
+          <option>Materia Mercantil (Pagarés, adeudos comerciales)</option>
+          <option>Materia Penal (Delitos de querella, abuso de confianza, despojo sin violencia)</option>
+          <option>Materia Comunitaria y Vecinal (Conflictos vecinales, condominios)</option>
+        </select>
+      </div>
+
+      <div>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+          <label class="text-sm font-bold text-slate-700">Relato de los hechos</label>
+          <button type="button" id="btn-dictado" onclick="alternarDictadoVoz()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-300 no-imprimir">
+            🎙 <span id="etiqueta-dictado">Dictar con voz</span>
+          </button>
+        </div>
+        <textarea id="campo-relato" rows="4" placeholder="Describa brevemente su situación o presione Dictar con voz..." class="w-full px-4 py-3 rounded-xl border border-slate-300"></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">Persona invitada / contraparte</label>
+          <input type="text" id="campo-contraparte" placeholder="Nombre de la otra persona involucrada" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
+        </div>
+        <div class="no-imprimir">
+          <label class="block text-sm font-bold text-slate-700 mb-1">Adjuntar identificación o prueba (PDF, JPG, PNG · Máx. 25MB)</label>
+          <input type="file" id="campo-archivo" accept=".pdf,.jpg,.jpeg,.png,.webm,.mp4" onchange="subirArchivoPrueba(this)" class="w-full text-sm text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800" />
+        </div>
+      </div>
+
+      <button onclick="guardarSolicitudCiudadano()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow no-imprimir">
+        Guardar en servidor
+      </button>
+    </div>
+
+    <!-- Acta y Firma -->
+    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-lg font-bold text-slate-900">Acta Redactada por el Abogado</h3>
+        <button onclick="firmarActaCiudadano()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold no-imprimir">
+          Firmar de conformidad
+        </button>
+      </div>
+      <div id="ciu-acta-texto" class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm whitespace-pre-wrap text-slate-700">
+        En espera de redacción por el abogado.
+      </div>
+      <div id="ciu-firma-box" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">
+        ✓ Acta firmada electrónicamente por el solicitante.
+      </div>
+    </div>
+
+    <!-- Bóveda SHA-256 -->
+    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
+      <h3 class="text-lg font-bold text-slate-900">Bóveda de Pruebas Certificadas (SHA-256)</h3>
+      <div id="ciu-lista-pruebas" class="space-y-2 text-sm text-slate-600">Sin archivos cargados aún.</div>
+    </div>
+
+    <!-- Chat con Abogado -->
+    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3 no-imprimir">
+      <h3 class="text-lg font-bold text-slate-900">Mensajes con el Abogado</h3>
+      <div id="ciu-chat" class="max-h-60 overflow-y-auto space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200 text-sm"></div>
+      <div class="flex gap-2">
+        <input type="text" id="ciu-msg-input" placeholder="Escriba su consulta..." class="flex-1 px-4 py-3 rounded-xl border border-slate-300" />
+        <button onclick="enviarMensaje('ciu-msg-input')" class="px-5 py-3 rounded-xl bg-slate-900 text-white font-bold">Enviar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANEL DEL ABOGADO / PRESTADOR DE SERVICIO IJA -->
+  <section id="vista-abogado" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Lista de Expedientes -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3 no-imprimir">
+        <div class="flex items-center justify-between border-b pb-3">
+          <h2 class="font-bold text-slate-900">Expedientes Asignados</h2>
+          <button onclick="cargarExpedientes()" class="text-xs font-bold text-amber-700 hover:underline">Actualizar</button>
+        </div>
+        <div id="abo-lista-expedientes" class="space-y-2"></div>
+      </div>
+
+      <!-- Mesa Jurídica del Expediente Seleccionado -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+            <div>
+              <span id="abo-folio" class="text-xs font-bold text-amber-700 uppercase">Seleccione un expediente</span>
+              <h3 id="abo-ciudadano" class="text-xl font-bold text-slate-900">—</h3>
+              <p id="abo-meta" class="text-xs text-slate-500 mt-0.5">—</p>
+            </div>
+            <button onclick="abrirModalVideo()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold no-imprimir">
+              Sala de Comparecencia
+            </button>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm space-y-1">
+            <p><strong>Materia:</strong> <span id="abo-materia">—</span></p>
+            <p><strong>Contraparte:</strong> <span id="abo-contraparte">—</span></p>
+            <p><strong>Relato del ciudadano:</strong> <span id="abo-relato">—</span></p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 no-imprimir">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Estatus del trámite</label>
+              <select id="abo-estatus" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold">
+                <option>En revisión por abogado</option>
+                <option>Invitación enviada a contraparte</option>
+                <option>Audiencia remota programada</option>
+                <option>Convenio firmado y concluido</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Fecha / Sala de cita virtual</label>
+              <input type="text" id="abo-cita" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-sm font-bold text-slate-700">Redacción de Acta / Convenio IJA</label>
+              <button onclick="insertarPlantillaActa()" class="px-3 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold no-imprimir">
+                Cargar formato oficial IJA
+              </button>
+            </div>
+            <textarea id="abo-acta" rows="8" placeholder="Redacte aquí el acta de comparecencia o convenio..." class="w-full px-4 py-3 rounded-xl border border-slate-300 font-mono text-xs"></textarea>
+          </div>
+
+          <div id="abo-firma-estado" class="text-xs font-bold text-slate-500"></div>
+
+          <button onclick="guardarGestionAbogado()" class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm no-imprimir">
+            Guardar acta y estatus en servidor
+          </button>
+        </div>
+
+        <!-- Bóveda SHA-256 Vista Abogado -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
+          <h4 class="font-bold text-slate-900">Evidencias y Videos en Bóveda (SHA-256)</h4>
+          <div id="abo-lista-pruebas" class="space-y-2 text-sm text-slate-600">Sin pruebas adjuntas.</div>
+        </div>
+
+        <!-- Chat Vista Abogado -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3 no-imprimir">
+          <h4 class="font-bold text-slate-900">Comunicación con el Solicitante</h4>
+          <div id="abo-chat" class="max-h-52 overflow-y-auto space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200 text-sm"></div>
+          <div class="flex gap-2">
+            <input type="text" id="abo-msg-input" placeholder="Escriba indicaciones al ciudadano..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm" />
+            <button onclick="enviarMensaje('abo-msg-input')" class="px-5 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-sm">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DE VIDEOLLAMADA Y GRABACIÓN CERTIFICADA -->
+  <div id="modal-video" class="hidden fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 no-imprimir">
+    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl">
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 class="font-bold">Sala de Comparecencia Remota · Grabación SHA-256</h3>
+        <button onclick="cerrarModalVideo()" class="text-slate-300 hover:text-white font-bold text-lg">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <video id="video-preview" autoplay muted playsinline class="w-full h-72 bg-black rounded-xl object-cover"></video>
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950">
+          <strong>Aviso de Confidencialidad de Sesión:</strong> La grabación de esta comparecencia es confidencial conforme al artículo 7 de la Ley de Justicia Alternativa del Estado de Jalisco y queda resguardada bajo sello criptográfico SHA-256 únicamente como constancia procedimental.
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <span id="video-estado" class="text-xs font-bold text-slate-600">Cámara lista para comparecencia.</span>
+          <div class="flex gap-2">
+            <button id="btn-iniciar-grab" onclick="iniciarGrabacionVideo()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold">
+              ● Aceptar y grabar en bóveda
+            </button>
+            <button id="btn-detener-grab" onclick="detenerGrabacionVideo()" class="hidden px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold">
+              ■ Detener y guardar video
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LEGAL: TÉRMINOS Y CONDICIONES / AVISO DE PRIVACIDAD INTEGRAL -->
+  <div id="modal-legal" class="hidden fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 no-imprimir">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        <h3 id="modal-legal-titulo" class="font-bold">Documento Legal</h3>
+        <button onclick="cerrarModalLegal()" class="text-slate-300 hover:text-white font-bold text-lg">✕</button>
+      </div>
+      <div id="modal-legal-cuerpo" class="p-6 overflow-y-auto text-xs text-slate-700 space-y-3 leading-relaxed"></div>
+      <div class="bg-slate-100 px-6 py-3 flex justify-end border-t">
+        <button onclick="cerrarModalLegal()" class="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIE DE PÁGINA INSTITUCIONAL -->
+  <footer class="bg-white border-t border-slate-200 mt-12 py-6 px-4 text-center text-xs text-slate-500">
+    <div class="flex flex-wrap justify-center gap-4 mb-2 font-bold text-slate-700 no-imprimir">
+      <button onclick="abrirModalLegal('terminos')" class="hover:underline">Términos y Condiciones de Uso</button>
+      <span>·</span>
+      <button onclick="abrirModalLegal('privacidad')" class="hover:underline">Aviso de Privacidad Integral (ITEI Jalisco)</button>
+      <span>·</span>
+      <button onclick="abrirModalLegal('seguridad')" class="hover:underline">Política de Seguridad y Cadena de Custodia SHA-256</button>
+    </div>
+    <p class="font-bold text-slate-700">© 2026 Sistema de Atención Remota y Comparecencia Preferente · Todos los derechos reservados.</p>
+    <p class="mt-1">Desarrollado para el Instituto de Justicia Alternativa del Estado de Jalisco. Resguardo sujeto a la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Jalisco y sus Municipios.</p>
+  </footer>
+
+  <script>
+    let token = localStorage.getItem('ija_token') || '';
+    let usuarioActual = JSON.parse(localStorage.getItem('ija_usuario') || 'null');
+    let expedientesCache = [];
+    let expedienteActivo = null;
+    let streamVideo = null;
+    let mediaRecorder = null;
+    let chunksVideo = [];
+
+    const TEXTOS_LEGALES = {
+      terminos: {
+        titulo: 'Términos y Condiciones de Uso · Plataforma Remota IJA Jalisco',
+        html: `
+          <p><strong>1. Objeto y Naturaleza del Servicio:</strong> La presente plataforma facilita el acceso preferente a los Métodos Alternos de Solución de Conflictos (mediación, conciliación y negociación asistida) a distancia para adultos mayores y personas con movilidad reducida en el Estado de Jalisco, en términos de la <em>Ley de Justicia Alternativa del Estado de Jalisco</em>.</p>
+          <p><strong>2. Principio de Voluntariedad y Buena Fe:</strong> El uso de la plataforma es estrictamente voluntario. El solicitante declara bajo protesta de decir verdad que los datos y documentos digitales aportados son auténticos y corresponden al asunto planteado.</p>
+          <p><strong>3. Confidencialidad Absoluta:</strong> De conformidad con los artículos 7 y 49 de la Ley de Justicia Alternativa del Estado de Jalisco, toda información verbal, escrita o audiovisual vertida durante el trámite es estrictamente confidencial y no podrá ser divulgada, grabada por terceros ni utilizada en perjuicio de las partes en juicio diverso.</p>
+          <p><strong>4. Validez de Actuaciones Remotas:</strong> Las comparecencias por videoconferencia, la aceptación electrónica de actas y los registros con huella criptográfica SHA-256 constituyen constancias administrativas válidas dentro del expediente electrónico institucional.</p>
+        `
+      },
+      privacidad: {
+        titulo: 'Aviso de Privacidad Integral · Instituto de Justicia Alternativa (Jalisco)',
+        html: `
+          <p><strong>1. Responsable del Tratamiento:</strong> El Instituto de Justicia Alternativa del Estado de Jalisco (IJA), con domicilio en Av. Enrique Díaz de León Norte #316, Col. Villaseñor, C.P. 44600, Guadalajara, Jalisco, es responsable del uso y protección de sus datos personales.</p>
+          <p><strong>2. Datos Personales Recabados:</strong> Nombre completo, edad, municipio de residencia, teléfono, correo electrónico, condición de movilidad o salud (datos personales sensibles para acreditar atención preferente), narración de hechos, identificaciones oficiales, voz e imagen durante la comparecencia remota.</p>
+          <p><strong>3. Finalidades Primarias:</strong> Integrar el expediente electrónico, acreditar la identidad de las partes, girar invitaciones a los mediados, celebrar sesiones a distancia y elaborar convenios o actas conclusivas.</p>
+          <p><strong>4. Transferencia de Datos:</strong> Sus datos personales no serán transferidos a terceros, salvo requerimientos fundados y motivados de autoridad jurisdiccional o ministerial competente, conforme a la <em>Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Jalisco y sus Municipios</em>.</p>
+          <p><strong>5. Derechos ARCO:</strong> Usted podrá ejercer sus derechos de Acceso, Rectificación, Cancelación u Oposición (ARCO) directamente ante la Unidad de Transparencia del IJA Jalisco o a través de la Plataforma Nacional de Transparencia.</p>
+        `
+      },
+      seguridad: {
+        titulo: 'Política de Seguridad Informática y Cadena de Custodia SHA-256',
+        html: `
+          <p><strong>1. Cifrado e Integridad Probatoria (SHA-256):</strong> Todo documento o video de comparecencia ingresado a la bóveda genera automáticamente un resumen criptográfico único de 256 bits (SHA-256). Cualquier alteración posterior de un solo bit invalida la huella original.</p>
+          <p><strong>2. Control de Acceso y Trazabilidad:</strong> El sistema opera con tokens de sesión firmados (JWT), bloqueo automático ante intentos de intrusión por fuerza bruta, cabeceras HTTP anti-secuestro de sesión y bitácora permanente de auditoría con registro de IP y marca de tiempo.</p>
+          <p><strong>3. Soberanía de Datos Institucionales:</strong> La infraestructura está diseñada para operar directamente en servidores propios del Instituto (<em>on-premise</em>) bajo protocolo seguro HTTPS/TLS.</p>
+        `
+      }
+    };
+
+    function abrirModalLegal(tipo) {
+      const info = TEXTOS_LEGALES[tipo];
+      if (!info) return;
+      document.getElementById('modal-legal-titulo').innerText = info.titulo;
+      document.getElementById('modal-legal-cuerpo').innerHTML = info.html;
+      document.getElementById('modal-legal').classList.remove('hidden');
+    }
+
+    function cerrarModalLegal() {
+      document.getElementById('modal-legal').classList.add('hidden');
+    }
+
+    function alternarTamanoTexto() {
+      document.body.classList.toggle('texto-grande');
+      const grande = document.body.classList.contains('texto-grande');
+      document.getElementById('btn-texto').innerText = grande ? 'T Texto: Grande' : 'T Texto: Normal';
+    }
+
+    function cambiarTabAuth(tab) {
+      const esLogin = tab === 'login';
+      document.getElementById('form-login').classList.toggle('hidden', !esLogin);
+      document.getElementById('form-registro').classList.toggle('hidden', esLogin);
+      document.getElementById('tab-login').className = esLogin ? 'py-2.5 rounded-lg font-bold text-sm bg-white shadow text-slate-900' : 'py-2.5 rounded-lg font-bold text-sm text-slate-600';
+      document.getElementById('tab-registro').className = !esLogin ? 'py-2.5 rounded-lg font-bold text-sm bg-white shadow text-slate-900' : 'py-2.5 rounded-lg font-bold text-sm text-slate-600';
+    }
+
+    function alternarCamposRol() {
+      const rol = document.getElementById('reg-rol').value;
+      document.getElementById('bloque-datos-ciudadano').classList.toggle('hidden', rol === 'abogado');
+    }
+
+    async function accesoDirectoAbogado() {
+      const email = 'abogado@ija.gob.mx';
+      const password = 'ija2026';
+      let res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (!res.ok) {
+        res = await fetch('/api/auth/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombre: 'Lic. Prestador de Servicio IJA',
+            email,
+            password,
+            rol: 'abogado',
+            municipio: 'Guadalajara'
+          })
+        });
+      }
+      const data = await res.json();
+      if (data.token) guardarSesion(data.token, data.usuario);
+    }
+
+    async function enviarLogin(e) {
+      e.preventDefault();
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('login-email').value,
+          password: document.getElementById('login-pass').value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) return alert(data.error || 'Error al iniciar sesión');
+      guardarSesion(data.token, data.usuario);
+    }
+
+    async function enviarRegistro(e) {
+      e.preventDefault();
+      const res = await fetch('/api/auth/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: document.getElementById('reg-nombre').value,
+          email: document.getElementById('reg-email').value,
+          password: document.getElementById('reg-pass').value,
+          rol: document.getElementById('reg-rol').value,
+          edad: document.getElementById('reg-edad').value,
+          municipio: document.getElementById('reg-municipio').value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) return alert(data.error || 'Error al registrar');
+      guardarSesion(data.token, data.usuario);
+    }
+
+    function guardarSesion(nuevoToken, usuario) {
+      token = nuevoToken;
+      usuarioActual = usuario;
+      localStorage.setItem('ija_token', token);
+      localStorage.setItem('ija_usuario', JSON.stringify(usuario));
+      iniciarInterfaz();
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem('ija_token');
+      localStorage.removeItem('ija_usuario');
+      token = '';
+      usuarioActual = null;
+      location.reload();
+    }
+
+    async function iniciarInterfaz() {
+      if (!token || !usuarioActual) return;
+      document.getElementById('vista-auth').classList.add('hidden');
+      document.getElementById('btn-salir').classList.remove('hidden');
+      document.getElementById('btn-pdf').classList.remove('hidden');
+      document.getElementById('btn-video-top').classList.remove('hidden');
+
+      if (usuarioActual.rol === 'abogado') {
+        document.getElementById('vista-abogado').classList.remove('hidden');
+      } else {
+        document.getElementById('vista-ciudadano').classList.remove('hidden');
+      }
+      await cargarExpedientes();
+    }
+
+    async function cargarExpedientes() {
+      const res = await fetch('/api/expedientes', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return cerrarSesion();
+      expedientesCache = await res.json();
+
+      if (usuarioActual.rol === 'abogado') {
+        renderListaAbogado();
+        if (expedientesCache.length > 0) {
+          const idActual = expedienteActivo ? expedienteActivo.id : expedientesCache[0].id;
+          seleccionarExpedienteAbogado(idActual);
+        }
+      } else if (expedientesCache.length > 0) {
+        expedienteActivo = expedientesCache[0];
+        renderVistaCiudadano(expedienteActivo);
+      }
+    }
+
+    function renderVistaCiudadano(exp) {
+      document.getElementById('ciu-folio').innerText = exp.folio;
+      document.getElementById('ciu-bienvenida').innerText = `${exp.ciudadano_nombre} · ${exp.municipio || 'Jalisco'}`;
+      document.getElementById('ciu-estatus').innerText = exp.estatus;
+      document.getElementById('campo-telefono').value = exp.telefono || '';
+      if (exp.movilidad) document.getElementById('campo-movilidad').value = exp.movilidad;
+      if (exp.materia) document.getElementById('campo-materia').value = exp.materia;
+      document.getElementById('campo-relato').value = exp.relato || '';
+      document.getElementById('campo-contraparte').value = exp.contraparte || '';
+      document.getElementById('ciu-acta-texto').innerText = exp.acta_legal || 'En espera de redacción por el abogado.';
+      document.getElementById('ciu-firma-box').classList.toggle('hidden', !exp.firma_base64);
+
+      renderPruebas('ciu-lista-pruebas', exp.pruebas || []);
+      renderChat('ciu-chat', exp.mensajes || []);
+    }
+
+    function renderListaAbogado() {
+      const cont = document.getElementById('abo-lista-expedientes');
+      if (!expedientesCache.length) {
+        cont.innerHTML = '<p class="text-xs text-slate-500">No hay solicitudes registradas aún.</p>';
+        return;
+      }
+      cont.innerHTML = expedientesCache.map(exp => `
+        <button onclick="seleccionarExpedienteAbogado(${exp.id})" class="w-full text-left p-3 rounded-xl border ${expedienteActivo && expedienteActivo.id === exp.id ? 'border-amber-500 bg-amber-50' : 'border-slate-200 hover:bg-slate-50'}">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-amber-800">${exp.folio}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 font-semibold">${exp.estatus}</span>
+          </div>
+          <p class="font-bold text-sm text-slate-900 mt-1">${exp.ciudadano_nombre}</p>
+          <p class="text-xs text-slate-500">${exp.municipio || ''} · ${exp.edad || ''} años</p>
+        </button>
+      `).join('');
+    }
+
+    function seleccionarExpedienteAbogado(id) {
+      expedienteActivo = expedientesCache.find(e => e.id === id);
+      if (!expedienteActivo) return;
+      renderListaAbogado();
+
+      document.getElementById('abo-folio').innerText = expedienteActivo.folio;
+      document.getElementById('abo-ciudadano').innerText = expedienteActivo.ciudadano_nombre;
+      document.getElementById('abo-meta').innerText = `Edad: ${expedienteActivo.edad || 'N/D'} · Municipio: ${expedienteActivo.municipio || 'Jalisco'} · Tel: ${expedienteActivo.telefono || 'Sin teléfono'} · Motivo: ${expedienteActivo.movilidad || 'Preferente'}`;
+      document.getElementById('abo-materia').innerText = expedienteActivo.materia || 'Sin especificar';
+      document.getElementById('abo-contraparte').innerText = expedienteActivo.contraparte || 'Sin especificar';
+      document.getElementById('abo-relato').innerText = expedienteActivo.relato || 'Sin relato aún';
+      document.getElementById('abo-estatus').value = expedienteActivo.estatus;
+      document.getElementById('abo-cita').value = expedienteActivo.cita || '';
+      document.getElementById('abo-acta').value = expedienteActivo.acta_legal || '';
+      document.getElementById('abo-firma-estado').innerText = expedienteActivo.firma_base64
+        ? '✓ Firmado de conformidad por el solicitante.'
+        : 'Pendiente de firma electrónica por el ciudadano.';
+
+      renderPruebas('abo-lista-pruebas', expedienteActivo.pruebas || []);
+      renderChat('abo-chat', expedienteActivo.mensajes || []);
+    }
+
+    function renderPruebas(elementId, pruebas) {
+      const el = document.getElementById(elementId);
+      if (!pruebas.length) {
+        el.innerHTML = 'Sin archivos cargados aún.';
+        return;
+      }
+      el.innerHTML = pruebas.map(p => `
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="font-bold text-slate-900">[${p.codigo_prueba}] ${p.nombre_archivo}</span>
+            <p class="text-[11px] font-mono text-slate-500 break-all">SHA-256: ${p.hash_sha256}</p>
+          </div>
+          <button onclick="descargarPrueba(${p.id}, '${p.nombre_archivo}')" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold no-imprimir">
+            Descargar
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderChat(elementId, mensajes) {
+      const el = document.getElementById(elementId);
+      if (!mensajes.length) {
+        el.innerHTML = '<p class="text-xs text-slate-400">Sin mensajes en el expediente.</p>';
+        return;
+      }
+      el.innerHTML = mensajes.map(m => `
+        <div class="p-2.5 rounded-lg ${m.emisor_rol === 'abogado' ? 'bg-amber-100/70 border border-amber-200' : 'bg-white border border-slate-200'}">
+          <span class="text-xs font-bold">${m.autor_nombre} (${m.emisor_rol}):</span>
+          <p class="text-slate-800 mt-0.5">${m.contenido}</p>
+        </div>
+      `).join('');
+    }
+
+    async function guardarSolicitudCiudadano() {
+      if (!expedienteActivo) return;
+      const res = await fetch(`/api/expedientes/${expedienteActivo.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          telefono: document.getElementById('campo-telefono').value,
+          movilidad: document.getElementById('campo-movilidad').value,
+          materia: document.getElementById('campo-materia').value,
+          relato: document.getElementById('campo-relato').value,
+          contraparte: document.getElementById('campo-contraparte').value
+        })
+      });
+      if (res.ok) {
+        alert('Solicitud guardada correctamente en el servidor.');
+        await cargarExpedientes();
+      }
+    }
+
+    function insertarPlantillaActa() {
+      if (!expedienteActivo) return;
+      const fecha = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('abo-acta').value =
+`INSTITUTO DE JUSTICIA ALTERNATIVA DEL ESTADO DE JALISCO
+ACTA DE COMPARECENCIA Y SOLICITUD DE MÉTODO ALTERNO A DISTANCIA
+
+FOLIO OFICIAL: ${expedienteActivo.folio}
+FECHA: ${fecha}
+MUNICIPIO: ${expedienteActivo.municipio || 'Guadalajara'}, Jalisco.
+
+En atención preferente por ${expedienteActivo.movilidad || 'movilidad reducida'}, comparece vía remota el/la C. ${expedienteActivo.ciudadano_nombre}, manifestando su voluntad de iniciar trámite en ${expedienteActivo.materia || 'Materia Familiar'} respecto de los hechos narrados en su expediente, señalando como persona invitada a ${expedienteActivo.contraparte || 'la contraparte'}.
+
+ACUERDOS Y SEGUIMIENTO:
+1. Se radica la solicitud y se resguardan las evidencias digitales en la bóveda institucional con sello criptográfico SHA-256.
+2. Se gira invitación formal para sesión de mediación/conciliación a distancia conforme a la Ley de Justicia Alternativa del Estado de Jalisco.
+
+Firma electrónica de conformidad del solicitante y validación del Prestador de Servicio Certificado.`;
+    }
+
+    async function guardarGestionAbogado() {
+      if (!expedienteActivo) return;
+      const res = await fetch(`/api/expedientes/${expedienteActivo.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          estatus: document.getElementById('abo-estatus').value,
+          cita: document.getElementById('abo-cita').value,
+          acta_legal: document.getElementById('abo-acta').value
+        })
+      });
+      if (res.ok) {
+        alert('Acta y estatus guardados en el expediente.');
+        await cargarExpedientes();
+      }
+    }
+
+    async function firmarActaCiudadano() {
+      if (!expedienteActivo) return;
+      const firma = `FIRMADO_DIGITALMENTE_${usuarioActual.nombre}_${new Date().toISOString()}`;
+      const res = await fetch(`/api/expedientes/${expedienteActivo.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ firma_base64: firma })
+      });
+      if (res.ok) {
+        alert('Firma electrónica estampada correctamente.');
+        await cargarExpedientes();
+      }
+    }
+
+    async function subirArchivoPrueba(input) {
+      if (!input.files.length || !expedienteActivo) return;
+      const formData = new FormData();
+      formData.append('archivo', input.files[0]);
+      formData.append('tipo', 'Documento / Evidencia');
+      const res = await fetch(`/api/expedientes/${expedienteActivo.id}/pruebas`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Archivo certificado con SHA-256 y guardado en bóveda.');
+        input.value = '';
+        await cargarExpedientes();
+      } else {
+        alert(data.error || 'No se pudo subir el archivo.');
+      }
+    }
+
+    async function descargarPrueba(id, nombre) {
+      const res = await fetch(`/api/pruebas/${id}/descargar`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nombre;
+      a.click();
+    }
+
+    async function enviarMensaje(inputId) {
+      const input = document.getElementById(inputId);
+      const contenido = input.value.trim();
+      if (!contenido || !expedienteActivo) return;
+      const res = await fetch(`/api/expedientes/${expedienteActivo.id}/mensajes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ contenido })
+      });
+      if (res.ok) {
+        input.value = '';
+        await cargarExpedientes();
+      }
+    }
+
+    // Dictado por Voz Continuo
+    let reconocimientoVoz = null;
+    let dictandoActivo = false;
+
+    function alternarDictadoVoz() {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) return alert('Usa Google Chrome o Microsoft Edge para dictar por voz.');
+      const btn = document.getElementById('btn-dictado');
+      const etiqueta = document.getElementById('etiqueta-dictado');
+
+      if (dictandoActivo && reconocimientoVoz) {
+        reconocimientoVoz.stop();
+        return;
+      }
+
+      reconocimientoVoz = new SpeechRec();
+      reconocimientoVoz.lang = 'es-MX';
+      reconocimientoVoz.continuous = true;
+      reconocimientoVoz.interimResults = false;
+
+      reconocimientoVoz.onstart = () => {
+        dictandoActivo = true;
+        etiqueta.innerText = 'Escuchando... (clic para detener)';
+        btn.classList.remove('bg-slate-100', 'text-slate-800');
+        btn.classList.add('bg-red-600', 'text-white', 'animate-pulse');
+      };
+
+      reconocimientoVoz.onresult = (evento) => {
+        const campo = document.getElementById('campo-relato');
+        for (let i = evento.resultIndex; i < evento.results.length; i++) {
+          if (evento.results[i].isFinal) {
+            const texto = evento.results[i][0].transcript.trim();
+            campo.value = campo.value ? `${campo.value} ${texto}` : texto;
+          }
+        }
+      };
+
+      reconocimientoVoz.onerror = (e) => alert(`Error de micrófono: ${e.error}`);
+      reconocimientoVoz.onend = () => {
+        dictandoActivo = false;
+        etiqueta.innerText = 'Dictar con voz';
+        btn.classList.remove('bg-red-600', 'text-white', 'animate-pulse');
+        btn.classList.add('bg-slate-100', 'text-slate-800');
+      };
+
+      reconocimientoVoz.start();
+    }
+
+    // Videollamada y Grabación SHA-256
+    async function abrirModalVideo() {
+      document.getElementById('modal-video').classList.remove('hidden');
+      try {
+        streamVideo = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById('video-preview').srcObject = streamVideo;
+      } catch (e) {
+        document.getElementById('video-estado').innerText = 'No se pudo acceder a cámara/micrófono.';
+      }
+    }
+
+    function cerrarModalVideo() {
+      document.getElementById('modal-video').classList.add('hidden');
+      if (streamVideo) {
+        streamVideo.getTracks().forEach(t => t.stop());
+        streamVideo = null;
+      }
+    }
+
+    function iniciarGrabacionVideo() {
+      if (!streamVideo) return;
+      chunksVideo = [];
+      mediaRecorder = new MediaRecorder(streamVideo);
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunksVideo.push(e.data); };
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(chunksVideo, { type: 'video/webm' });
+        const formData = new FormData();
+        formData.append('archivo', blob, `comparecencia_${Date.now()}.webm`);
+        formData.append('tipo', 'Video Comparecencia');
+        document.getElementById('video-estado').innerText = 'Certificando video con SHA-256...';
+        const res = await fetch(`/api/expedientes/${expedienteActivo.id}/pruebas`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        if (res.ok) {
+          document.getElementById('video-estado').innerText = '✓ Video guardado en bóveda con huella SHA-256.';
+          await cargarExpedientes();
+        }
+      };
+      mediaRecorder.start();
+      document.getElementById('btn-iniciar-grab').classList.add('hidden');
+      document.getElementById('btn-detener-grab').classList.remove('hidden');
+      document.getElementById('video-estado').innerText = '● Grabando comparecencia...';
+    }
+
+    function detenerGrabacionVideo() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        document.getElementById('btn-iniciar-grab').classList.remove('hidden');
+        document.getElementById('btn-detener-grab').classList.add('hidden');
+      }
+    }
+
+    iniciarInterfaz();
+  </script>
+</body>
+</html>

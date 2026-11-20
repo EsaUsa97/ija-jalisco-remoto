@@ -1,0 +1,8 @@
+flask
+flask-cors
+PyJWT
+werkzeug
+python-dotenv
+psycopg[binary]
+gunicorn
+waitress
