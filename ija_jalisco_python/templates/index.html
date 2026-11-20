@@ -44,7 +44,7 @@
           Exportar Constancia PDF
         </button>
         <button onclick="abrirModalVideo()" id="btn-video-top" class="hidden px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 text-sm font-semibold">
-          Ratificación por Video
+          🎥 Videollamada en Vivo
         </button>
         <button onclick="cerrarSesion()" id="btn-salir" class="hidden px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 text-sm font-semibold">
           Salir
@@ -76,7 +76,7 @@
           </button>
         </div>
 
-        <!-- Formulario Login (Ciudadanos y Cuenta Única OIC) -->
+        <!-- Formulario Login -->
         <form id="form-login" onsubmit="enviarLogin(event)" class="space-y-4">
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-1">Correo electrónico</label>
@@ -97,7 +97,7 @@
         <!-- Formulario Registro Ciudadano -->
         <form id="form-registro" onsubmit="enviarRegistro(event)" class="hidden space-y-4">
           <div>
-            <label class="block text-sm font-bold text-slate-700 mb-1">Nombre completo de la persona denunciante</label>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Nombre completo de la persona denunciante (o Seudónimo si solicita reserva)</label>
             <input type="text" id="reg-nombre" required placeholder="Nombre(s) y apellidos" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -119,7 +119,6 @@
             <input type="password" id="reg-pass" required minlength="6" placeholder="Cree una contraseña segura" class="w-full px-4 py-3 rounded-xl border border-slate-300" />
           </div>
 
-          <!-- Bloque Legal: Términos y Condiciones + Aviso de Privacidad Integral -->
           <div class="p-4 rounded-xl bg-slate-50 border border-slate-300 text-xs text-slate-700 space-y-2.5">
             <p class="font-bold text-slate-900">Consentimiento Legal y Protección de Datos de la Persona Denunciante</p>
             <label class="flex items-start gap-2 cursor-pointer">
@@ -151,9 +150,10 @@
         <span class="text-xs uppercase tracking-wider text-amber-400 font-bold">Folio Oficial de Denuncia OIC</span>
         <h2 id="ciu-folio" class="text-2xl font-extrabold mt-0.5">OIC-IJA-2026-0001</h2>
         <p id="ciu-bienvenida" class="text-slate-300 text-sm mt-1">Denunciante</p>
+        <p id="ciu-cita-banner" class="text-xs text-amber-300 font-semibold mt-1"></p>
       </div>
       <button onclick="abrirModalVideo()" class="px-5 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg no-imprimir">
-        Grabar comparecencia / ratificación
+        🎥 Entrar a Videollamada con Abogado OIC
       </button>
     </div>
 
@@ -175,6 +175,7 @@
             <option>Persona con movilidad reducida o discapacidad</option>
             <option>Requiere intérprete o traductor (Lengua indígena / señas / idioma)</option>
             <option>Reside fuera de la ciudad o en otro municipio/estado</option>
+            <option>Solicita reserva de identidad / Denuncia confidencial</option>
             <option>Otro motivo / Denuncia ciudadana general</option>
           </select>
         </div>
@@ -218,19 +219,35 @@
       </button>
     </div>
 
-    <!-- Acuerdo / Constancia del OIC y Firma -->
+    <!-- Acuerdo / Constancia del OIC + Lectura en Voz Alta + Firma Táctil -->
     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h3 class="text-lg font-bold text-slate-900">Acuerdo de Radicación / Acta del Órgano Interno de Control</h3>
-        <button onclick="firmarActaCiudadano()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold no-imprimir">
-          Ratificar y firmar electrónicamente
+        <button type="button" onclick="leerAcuerdoEnVozAlta()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-bold border border-slate-300 no-imprimir">
+          🔊 Escuchar acuerdo en voz alta
         </button>
       </div>
       <div id="ciu-acta-texto" class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm whitespace-pre-wrap text-slate-700">
         En espera de acuerdo de radicación por parte del Órgano Interno de Control del IJA.
       </div>
-      <div id="ciu-firma-box" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold">
-        ✓ Denuncia ratificada y firmada electrónicamente por la persona denunciante.
+
+      <!-- Pad de Firma Autógrafa en Pantalla -->
+      <div class="space-y-2 no-imprimir">
+        <label class="block text-xs font-bold text-slate-700">Dibuje su firma autógrafa con el dedo o mouse para ratificar su denuncia:</label>
+        <canvas id="canvas-firma" width="500" height="130" class="w-full max-w-lg h-32 bg-white border-2 border-dashed border-slate-300 rounded-xl touch-none cursor-crosshair"></canvas>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="limpiarCanvasFirma()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100">
+            Borrar trazo
+          </button>
+          <button type="button" onclick="firmarActaCiudadano()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow">
+            Ratificar y estampar firma electrónica
+          </button>
+        </div>
+      </div>
+
+      <div id="ciu-firma-box" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold space-y-2">
+        <p>✓ Denuncia ratificada y firmada electrónicamente por la persona denunciante.</p>
+        <img id="ciu-firma-img" class="max-h-20 bg-white p-1 rounded border border-emerald-200 hidden" alt="Firma autógrafa digital" />
       </div>
     </div>
 
@@ -272,8 +289,8 @@
               <h3 id="abo-ciudadano" class="text-xl font-bold text-slate-900">—</h3>
               <p id="abo-meta" class="text-xs text-slate-500 mt-0.5">—</p>
             </div>
-            <button onclick="abrirModalVideo()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold no-imprimir">
-              Audiencia de Ratificación
+            <button onclick="abrirModalVideo()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow no-imprimir">
+              🎥 Videollamada con Denunciante
             </button>
           </div>
 
@@ -310,7 +327,8 @@
             <textarea id="abo-acta" rows="8" placeholder="Redacte aquí el acuerdo de radicación o constancia de denuncia..." class="w-full px-4 py-3 rounded-xl border border-slate-300 font-mono text-xs"></textarea>
           </div>
 
-          <div id="abo-firma-estado" class="text-xs font-bold text-slate-500"></div>
+          <div id="abo-firma-estado" class="text-xs font-bold text-slate-600 space-y-2"></div>
+          <img id="abo-firma-img" class="max-h-20 bg-slate-50 p-1 rounded border border-slate-300 hidden" alt="Firma del denunciante" />
 
           <button onclick="guardarGestionAbogado()" class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm no-imprimir">
             Guardar acuerdo y estatus en expediente
@@ -336,29 +354,35 @@
     </div>
   </section>
 
-  <!-- MODAL DE VIDEOLLAMADA Y GRABACIÓN CERTIFICADA -->
-  <div id="modal-video" class="hidden fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 no-imprimir">
-    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl">
-      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
-        <h3 class="font-bold">Sala de Ratificación Remota OIC · Grabación SHA-256</h3>
-        <button onclick="cerrarModalVideo()" class="text-slate-300 hover:text-white font-bold text-lg">✕</button>
+  <!-- MODAL DE VIDEOLLAMADA BIDIRECCIONAL EN VIVO + GRABACIÓN SHA-256 -->
+  <div id="modal-video" class="hidden fixed inset-0 bg-slate-950/85 z-50 flex items-center justify-center p-3 no-imprimir">
+    <div class="bg-white rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+      <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm sm:text-base">Sala de Audiencia y Ratificación en Vivo · OIC - IJA</h3>
+          <p id="video-sala-nombre" class="text-[11px] text-amber-300 font-mono">Sala conectada al expediente</p>
+        </div>
+        <button onclick="cerrarModalVideo()" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm">✕ Cerrar</button>
       </div>
-      <div class="p-6 space-y-4">
-        <video id="video-preview" autoplay muted playsinline class="w-full h-72 bg-black rounded-xl object-cover"></video>
-        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950">
-          <strong>Reserva y Protección de Identidad:</strong> Esta grabación forma parte exclusiva de la carpeta de investigación administrativa del Órgano Interno de Control del IJA Jalisco bajo sello criptográfico SHA-256.
+
+      <!-- Contenedor de Videollamada Bidireccional WebRTC -->
+      <div class="flex-1 bg-black relative min-h-[380px]">
+        <iframe id="iframe-videollamada" allow="camera; microphone; fullscreen; display-capture; autoplay" class="w-full h-[420px] border-0"></iframe>
+      </div>
+
+      <!-- Barra de Invitación a Intérprete y Respaldo en Bóveda -->
+      <div class="p-4 bg-slate-50 border-t space-y-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs text-slate-700">
+            <strong>¿Requiere traductor o intérprete?</strong> Comparta este enlace directo de la sala:
+          </span>
+          <button type="button" onclick="copiarEnlaceSala()" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold">
+            📋 Copiar enlace de sala para intérprete / participante
+          </button>
         </div>
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <span id="video-estado" class="text-xs font-bold text-slate-600">Cámara lista para ratificación.</span>
-          <div class="flex gap-2">
-            <button id="btn-iniciar-grab" onclick="iniciarGrabacionVideo()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold">
-              ● Grabar ratificación en bóveda
-            </button>
-            <button id="btn-detener-grab" onclick="detenerGrabacionVideo()" class="hidden px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold">
-              ■ Detener y guardar video
-            </button>
-          </div>
-        </div>
+        <p class="text-[11px] text-slate-500">
+          La sesión opera bajo cifrado extremo a extremo. Al finalizar, el abogado del OIC puede redactar la constancia de ratificación directamente en el expediente.
+        </p>
       </div>
     </div>
   </div>
@@ -395,9 +419,7 @@
     let usuarioActual = JSON.parse(localStorage.getItem('ija_usuario') || 'null');
     let expedientesCache = [];
     let expedienteActivo = null;
-    let streamVideo = null;
-    let mediaRecorder = null;
-    let chunksVideo = [];
+    let urlSalaActual = '';
 
     const TEXTOS_LEGALES = {
       terminos: {
@@ -407,14 +429,14 @@
           <p><strong>2. Incompetencia sobre Conflictos entre Particulares:</strong> Este canal no tramita mediaciones ni conflictos entre particulares; cualquier asunto ajeno a la conducta de servidores públicos del IJA será orientado a las áreas correspondientes.</p>
           <p><strong>3. Accesibilidad Universal y No Discriminación:</strong> Cualquier persona puede presentar denuncia a distancia, garantizando ajustes razonables y atención preferente a personas adultas mayores, personas con movilidad reducida, personas que requieran intérprete o traductor, o quienes residan fuera del Área Metropolitana de Guadalajara.</p>
           <p><strong>4. Veracidad y Buena Fe:</strong> La persona denunciante manifiesta que los hechos narrados y evidencias aportadas son verídicos y se compromete a conducir su participación con respeto y buena fe procedimental.</p>
-          <p><strong>5. Validez de Actuaciones Electrónicas:</strong> Las constancias, ratificaciones por video y documentos con sello criptográfico SHA-256 tienen plena validez administrativa dentro del expediente de investigación del OIC.</p>
+          <p><strong>5. Validez de Actuaciones Electrónicas:</strong> Las constancias, audiencias por videollamada y documentos con sello criptográfico SHA-256 tienen plena validez administrativa dentro del expediente de investigación del OIC.</p>
         `
       },
       privacidad: {
         titulo: 'Aviso de Privacidad Integral · Órgano Interno de Control del IJA Jalisco',
         html: `
           <p><strong>1. Responsable del Tratamiento:</strong> El Órgano Interno de Control del Instituto de Justicia Alternativa del Estado de Jalisco (OIC-IJA), con domicilio en Av. Enrique Díaz de León Norte #316, Col. Villaseñor, C.P. 44600, Guadalajara, Jalisco.</p>
-          <p><strong>2. Datos Personales Recabados:</strong> Nombre completo, edad, municipio o lugar de residencia, teléfono, correo electrónico, condición de accesibilidad (movilidad reducida, requerimiento de intérprete/traductor), narración de hechos, evidencias digitales, voz e imagen de ratificación.</p>
+          <p><strong>2. Datos Personales Recabados:</strong> Nombre completo o seudónimo de reserva, edad, municipio o lugar de residencia, teléfono, correo electrónico, condición de accesibilidad (movilidad reducida, requerimiento de intérprete/traductor), narración de hechos, evidencias digitales, voz e imagen durante la audiencia remota.</p>
           <p><strong>3. Finalidades y Reserva de Identidad:</strong> Integrar el expediente de investigación administrativa, garantizar la protección de la identidad de la persona denunciante y notificarte el avance o resolución conforme a la <em>Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Jalisco y sus Municipios</em>.</p>
           <p><strong>4. Derechos ARCO:</strong> Podrás ejercer tus derechos de Acceso, Rectificación, Cancelación u Oposición directamente ante la Unidad de Transparencia del IJA Jalisco.</p>
         `
@@ -422,7 +444,7 @@
       seguridad: {
         titulo: 'Cadena de Custodia Digital SHA-256 y Seguridad Informática',
         html: `
-          <p><strong>1. Integridad Probatoria (SHA-256):</strong> Cada prueba documental, captura o video de ratificación ingresado genera una huella criptográfica SHA-256 única que garantiza su inalterabilidad durante toda la investigación del OIC.</p>
+          <p><strong>1. Integridad Probatoria (SHA-256):</strong> Cada prueba documental o captura ingresada genera una huella criptográfica SHA-256 única que garantiza su inalterabilidad durante toda la investigación del OIC.</p>
           <p><strong>2. Acceso Restringido:</strong> Únicamente la cuenta institucional autorizada del Órgano Interno de Control tiene acceso a la bandeja de denuncias recibidas, bajo cifrado HTTPS y bitácora permanente de auditoría.</p>
         `
       }
@@ -444,6 +466,16 @@
       document.body.classList.toggle('texto-grande');
       const grande = document.body.classList.contains('texto-grande');
       document.getElementById('btn-texto').innerText = grande ? 'T Texto: Grande' : 'T Texto: Normal';
+    }
+
+    function leerAcuerdoEnVozAlta() {
+      const texto = document.getElementById('ciu-acta-texto').innerText;
+      if (!('speechSynthesis' in window)) return alert('Tu navegador no soporta lectura en voz alta.');
+      window.speechSynthesis.cancel();
+      const voz = new SpeechSynthesisUtterance(texto);
+      voz.lang = 'es-MX';
+      voz.rate = 0.95;
+      window.speechSynthesis.speak(voz);
     }
 
     function cambiarTabAuth(tab) {
@@ -514,6 +546,7 @@
         document.getElementById('vista-abogado').classList.remove('hidden');
       } else {
         document.getElementById('vista-ciudadano').classList.remove('hidden');
+        inicializarCanvasFirma();
       }
       await cargarExpedientes();
     }
@@ -540,6 +573,7 @@
     function renderVistaCiudadano(exp) {
       document.getElementById('ciu-folio').innerText = exp.folio;
       document.getElementById('ciu-bienvenida').innerText = `${exp.ciudadano_nombre} · ${exp.municipio || 'Jalisco'}`;
+      document.getElementById('ciu-cita-banner').innerText = exp.cita ? `📅 Audiencia virtual programada: ${exp.cita}` : '';
       document.getElementById('ciu-estatus').innerText = exp.estatus;
       document.getElementById('campo-telefono').value = exp.telefono || '';
       if (exp.movilidad) document.getElementById('campo-movilidad').value = exp.movilidad;
@@ -547,7 +581,18 @@
       document.getElementById('campo-relato').value = exp.relato || '';
       document.getElementById('campo-contraparte').value = exp.contraparte || '';
       document.getElementById('ciu-acta-texto').innerText = exp.acta_legal || 'En espera de acuerdo de radicación por parte del Órgano Interno de Control del IJA.';
-      document.getElementById('ciu-firma-box').classList.toggle('hidden', !exp.firma_base64);
+
+      const firmaBox = document.getElementById('ciu-firma-box');
+      const firmaImg = document.getElementById('ciu-firma-img');
+      if (exp.firma_base64) {
+        firmaBox.classList.remove('hidden');
+        if (exp.firma_base64.startsWith('data:image')) {
+          firmaImg.src = exp.firma_base64;
+          firmaImg.classList.remove('hidden');
+        }
+      } else {
+        firmaBox.classList.add('hidden');
+      }
 
       renderPruebas('ciu-lista-pruebas', exp.pruebas || []);
       renderChat('ciu-chat', exp.mensajes || []);
@@ -585,9 +630,20 @@
       document.getElementById('abo-estatus').value = expedienteActivo.estatus;
       document.getElementById('abo-cita').value = expedienteActivo.cita || '';
       document.getElementById('abo-acta').value = expedienteActivo.acta_legal || '';
-      document.getElementById('abo-firma-estado').innerText = expedienteActivo.firma_base64
-        ? '✓ Denuncia ratificada y firmada electrónicamente por la persona denunciante.'
-        : 'Pendiente de firma electrónica de ratificación por la persona denunciante.';
+
+      const aboFirmaImg = document.getElementById('abo-firma-img');
+      if (expedienteActivo.firma_base64) {
+        document.getElementById('abo-firma-estado').innerText = '✓ Denuncia ratificada y firmada electrónicamente por la persona denunciante:';
+        if (expedienteActivo.firma_base64.startsWith('data:image')) {
+          aboFirmaImg.src = expedienteActivo.firma_base64;
+          aboFirmaImg.classList.remove('hidden');
+        } else {
+          aboFirmaImg.classList.add('hidden');
+        }
+      } else {
+        document.getElementById('abo-firma-estado').innerText = 'Pendiente de firma electrónica de ratificación por la persona denunciante.';
+        aboFirmaImg.classList.add('hidden');
+      }
 
       renderPruebas('abo-lista-pruebas', expedienteActivo.pruebas || []);
       renderChat('abo-chat', expedienteActivo.mensajes || []);
@@ -661,7 +717,7 @@ VISTO el escrito electrónico presentado vía remota por el/la C. ${expedienteAc
 SE ACUERDA:
 1. Téngase por recibida y radicada la denuncia a distancia con fundamento en la Ley General de Responsabilidades Administrativas y la Ley de Responsabilidades Políticas y Administrativas del Estado de Jalisco.
 2. Intégrense a la carpeta de investigación las pruebas digitales resguardadas en bóveda bajo sello criptográfico SHA-256.
-3. Notifíquese a la persona denunciante para efectos de ratificación electrónica o por videoconferencia y seguimiento procesal.
+3. Notifíquese a la persona denunciante para efectos de ratificación electrónica o por videollamada en vivo y seguimiento procesal.
 
 Validado por el Órgano Interno de Control del Instituto de Justicia Alternativa del Estado de Jalisco.`;
     }
@@ -683,16 +739,54 @@ Validado por el Órgano Interno de Control del Instituto de Justicia Alternativa
       }
     }
 
+    // Pad de Firma Táctil / Mouse
+    let dibujandoFirma = false;
+    function inicializarCanvasFirma() {
+      const canvas = document.getElementById('canvas-firma');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#0f172a';
+
+      const pos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: (clientX - rect.left) * (canvas.width / rect.width),
+          y: (clientY - rect.top) * (canvas.height / rect.height)
+        };
+      };
+
+      const iniciar = (e) => { dibujandoFirma = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+      const mover = (e) => { if (!dibujandoFirma) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
+      const detener = () => { dibujandoFirma = false; };
+
+      canvas.addEventListener('mousedown', iniciar);
+      canvas.addEventListener('mousemove', mover);
+      window.addEventListener('mouseup', detener);
+      canvas.addEventListener('touchstart', iniciar, { passive: false });
+      canvas.addEventListener('touchmove', mover, { passive: false });
+      canvas.addEventListener('touchend', detener);
+    }
+
+    function limpiarCanvasFirma() {
+      const canvas = document.getElementById('canvas-firma');
+      if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     async function firmarActaCiudadano() {
       if (!expedienteActivo) return;
-      const firma = `RATIFICADO_FIRMADO_${usuarioActual.nombre}_${new Date().toISOString()}`;
+      const canvas = document.getElementById('canvas-firma');
+      const firmaDataUrl = canvas ? canvas.toDataURL('image/png') : `RATIFICADO_${usuarioActual.nombre}`;
       const res = await fetch(`/api/expedientes/${expedienteActivo.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ firma_base64: firma })
+        body: JSON.stringify({ firma_base64: firmaDataUrl })
       });
       if (res.ok) {
-        alert('Denuncia ratificada y firmada electrónicamente.');
+        alert('Denuncia ratificada y firma autógrafa estampada electrónicamente.');
         await cargarExpedientes();
       }
     }
@@ -792,58 +886,28 @@ Validado por el Órgano Interno de Control del Instituto de Justicia Alternativa
       reconocimientoVoz.start();
     }
 
-    // Videollamada y Grabación SHA-256
-    async function abrirModalVideo() {
+    // Videollamada Bidireccional en Vivo por Folio
+    function abrirModalVideo() {
+      if (!expedienteActivo) return alert('Seleccione un expediente primero.');
+      const salaLimpia = `OIC_IJA_JALISCO_${expedienteActivo.folio.replace(/[^a-zA-Z0-9]/g, '_')}_SALA_SEGURA`;
+      const nombreUsuario = encodeURIComponent(usuarioActual.nombre);
+      urlSalaActual = `https://meet.jit.si/${salaLimpia}#userInfo.displayName="${nombreUsuario}"&config.prejoinPageEnabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=false`;
+
+      document.getElementById('video-sala-nombre').innerText = `Expediente: ${expedienteActivo.folio} · Conectado como: ${usuarioActual.nombre}`;
+      document.getElementById('iframe-videollamada').src = urlSalaActual;
       document.getElementById('modal-video').classList.remove('hidden');
-      try {
-        streamVideo = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        document.getElementById('video-preview').srcObject = streamVideo;
-      } catch (e) {
-        document.getElementById('video-estado').innerText = 'No se pudo acceder a cámara/micrófono.';
-      }
     }
 
     function cerrarModalVideo() {
+      document.getElementById('iframe-videollamada').src = '';
       document.getElementById('modal-video').classList.add('hidden');
-      if (streamVideo) {
-        streamVideo.getTracks().forEach(t => t.stop());
-        streamVideo = null;
-      }
     }
 
-    function iniciarGrabacionVideo() {
-      if (!streamVideo) return;
-      chunksVideo = [];
-      mediaRecorder = new MediaRecorder(streamVideo);
-      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunksVideo.push(e.data); };
-      mediaRecorder.onstop = async () => {
-        const blob = new Blob(chunksVideo, { type: 'video/webm' });
-        const formData = new FormData();
-        formData.append('archivo', blob, `ratificacion_oic_${Date.now()}.webm`);
-        formData.append('tipo', 'Video Ratificación OIC');
-        document.getElementById('video-estado').innerText = 'Certificando video con SHA-256...';
-        const res = await fetch(`/api/expedientes/${expedienteActivo.id}/pruebas`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` },
-          body: formData
-        });
-        if (res.ok) {
-          document.getElementById('video-estado').innerText = '✓ Video guardado en bóveda con huella SHA-256.';
-          await cargarExpedientes();
-        }
-      };
-      mediaRecorder.start();
-      document.getElementById('btn-iniciar-grab').classList.add('hidden');
-      document.getElementById('btn-detener-grab').classList.remove('hidden');
-      document.getElementById('video-estado').innerText = '● Grabando ratificación...';
-    }
-
-    function detenerGrabacionVideo() {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-        document.getElementById('btn-iniciar-grab').classList.remove('hidden');
-        document.getElementById('btn-detener-grab').classList.add('hidden');
-      }
+    function copiarEnlaceSala() {
+      if (!urlSalaActual) return;
+      const linkLimpio = urlSalaActual.split('#')[0];
+      navigator.clipboard.writeText(linkLimpio);
+      alert('Enlace de la sala copiado. Puede enviarlo por WhatsApp o chat a un traductor/intérprete o al denunciante.');
     }
 
     iniciarInterfaz();
