@@ -251,7 +251,7 @@
     </div>
   </section>
 
-  <!-- PANEL EXCLUSIVO DEL ÓRGANO INTERNO de CONTROL (OIC) -->
+  <!-- PANEL EXCLUSIVO DEL ÓRGANO INTERNO DE CONTROL (OIC) -->
   <section id="vista-abogado" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Bandeja de Denuncias Recibidas -->
@@ -336,33 +336,38 @@
     </div>
   </section>
 
-  <!-- MODAL DE VIDEOLLAMADA COMPARTIDA POR FOLIO Y GRABACIÓN CERTIFICADA SHA-256 -->
+  <!-- MODAL DE VIDEOLLAMADA FÁCIL (SIN DESCARGAR APP) + GRABACIÓN SHA-256 -->
   <div id="modal-video" class="hidden fixed inset-0 bg-slate-950/85 z-50 flex items-center justify-center p-4 no-imprimir">
     <div class="bg-white rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl">
       <div class="bg-slate-900 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 id="video-sala-titulo" class="font-bold text-sm sm:text-base">Sala de Audiencia / Ratificación Remota OIC</h3>
-          <p id="video-estado" class="text-xs text-emerald-400">Sala compartida por folio · Recuerde grabar la audiencia para generar huella SHA-256.</p>
+          <h3 id="video-sala-titulo" class="font-bold text-sm sm:text-base">Sala de Audiencia / Ratificación OIC</h3>
+          <p id="video-estado" class="text-xs text-emerald-400">Acceso directo en navegador · Sin descargar aplicaciones.</p>
         </div>
-        <button type="button" onclick="cerrarModalVideo()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold">
-          Colgar / Cerrar sala
-        </button>
+        <div class="flex items-center gap-2">
+          <a id="enlace-sala-externa" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold">
+            Abrir en pestaña nueva
+          </a>
+          <button type="button" onclick="cerrarModalVideo()" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold">
+            Colgar / Cerrar sala
+          </button>
+        </div>
       </div>
 
       <div class="p-4 space-y-3">
-        <div id="jitsi-contenedor" class="w-full h-[420px] rounded-xl overflow-hidden bg-slate-950 border border-slate-300"></div>
+        <div id="sala-video-contenedor" class="w-full h-[430px] rounded-xl overflow-hidden bg-slate-950 border border-slate-300"></div>
 
         <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950">
-          <strong>Protección de derechos y evidencia:</strong> Ambas personas deben entrar al mismo expediente/folio. Para guardar el video como prueba certificada con SHA-256, pulsa <em>Grabar audiencia como prueba</em> al iniciar y <em>Detener y guardar prueba SHA-256</em> al terminar.
+          <strong>Atención accesible y resguardo probatorio:</strong> Ambas personas entran con el mismo folio del expediente directamente desde su navegador. Para proteger los derechos de ambas partes, pulsa <em>Grabar audiencia como prueba</em> al iniciar y <em>Detener y guardar prueba SHA-256</em> al concluir.
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span id="grabacion-estado" class="text-xs font-bold text-slate-600">Grabación de prueba inactiva.</span>
           <div class="flex flex-wrap gap-2">
-            <button id="btn-grabar-aud" type="button" onclick="iniciarGrabacionAudienciaJitsi()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold">
+            <button id="btn-grabar-aud" type="button" onclick="iniciarGrabacionAudiencia()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold">
               ● Grabar audiencia como prueba
             </button>
-            <button id="btn-detener-aud" type="button" onclick="detenerGrabacionAudienciaJitsi()" class="hidden px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold">
+            <button id="btn-detener-aud" type="button" onclick="detenerGrabacionAudiencia()" class="hidden px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold">
               ■ Detener y guardar prueba SHA-256
             </button>
           </div>
@@ -405,11 +410,11 @@
     let expedienteActivo = null;
 
     // Estado de sala compartida por folio y grabación SHA-256
-    let grabadoraJitsi = null;
-    let trozosJitsi = [];
-    let streamGrabacionJitsi = null;
-    let expIdSalaActiva = null;
-    let folioSalaActiva = '';
+    let grabadoraAudienciaSala = null;
+    let trozosAudienciaSala = [];
+    let streamGrabacionSala = null;
+    let expIdSala = null;
+    let folioSala = '';
 
     const TEXTOS_LEGALES = {
       terminos: {
@@ -804,76 +809,71 @@ Validado por el Órgano Interno de Control del Instituto de Justicia Alternativa
       reconocimientoVoz.start();
     }
 
-    // Sala de videollamada compartida por folio (Jitsi) + grabación como prueba SHA-256
-    function sanitizarNombreSala(folio) {
-      return 'OIC_IJA_' + String(folio || 'EXP').replace(/[^a-zA-Z0-9_-]/g, '_');
+    // Videollamada fácil sin descargar app + grabación como prueba SHA-256
+    function codigoSalaPorFolio(folio) {
+      const limpio = String(folio || 'EXP').toLowerCase().replace(/[^a-z0-9]/g, '');
+      return `oic-ija-${limpio || 'audiencia'}`;
     }
 
     function abrirModalVideo() {
       if (!expedienteActivo) return alert('Seleccione un expediente primero.');
 
-      expIdSalaActiva = expedienteActivo.id;
-      folioSalaActiva = expedienteActivo.folio;
-      const salaNombre = sanitizarNombreSala(folioSalaActiva);
-      const usuarioParam = encodeURIComponent(usuarioActual?.nombre || 'Participante');
+      expIdSala = expedienteActivo.id;
+      folioSala = expedienteActivo.folio;
+      const nombreSala = codigoSalaPorFolio(folioSala);
+      const urlSala = `https://whereby.com/${nombreSala}`;
 
       document.getElementById('video-sala-titulo').innerText =
-        `Expediente ${folioSalaActiva} · ${usuarioActual?.nombre || ''}`;
+        `Expediente ${folioSala} · ${usuarioActual?.nombre || ''}`;
       document.getElementById('video-estado').innerText =
-        `Sala activa: ${salaNombre} (ambas partes entran con este mismo folio)`;
+        `Sala compartida del folio (${nombreSala}) · Listo en navegador sin descargar app`;
       document.getElementById('grabacion-estado').innerText = 'Grabación de prueba inactiva.';
+      document.getElementById('enlace-sala-externa').href = urlSala;
 
-      const urlSala =
-        `https://meet.jit.si/${salaNombre}` +
-        `#userInfo.displayName="${usuarioParam}"` +
-        `&config.prejoinPageEnabled=false` +
-        `&config.startWithAudioMuted=false` +
-        `&config.startWithVideoMuted=false`;
-
-      document.getElementById('jitsi-contenedor').innerHTML =
+      document.getElementById('sala-video-contenedor').innerHTML =
         `<iframe src="${urlSala}" allow="camera; microphone; fullscreen; display-capture; autoplay" class="w-full h-full border-0"></iframe>`;
 
       document.getElementById('modal-video').classList.remove('hidden');
     }
 
     function cerrarModalVideo() {
-      if (grabadoraJitsi && grabadoraJitsi.state !== 'inactive') {
-        detenerGrabacionAudienciaJitsi();
+      if (grabadoraAudienciaSala && grabadoraAudienciaSala.state !== 'inactive') {
+        detenerGrabacionAudiencia();
       }
-      if (streamGrabacionJitsi) {
-        streamGrabacionJitsi.getTracks().forEach(t => t.stop());
-        streamGrabacionJitsi = null;
+      if (streamGrabacionSala) {
+        streamGrabacionSala.getTracks().forEach(t => t.stop());
+        streamGrabacionSala = null;
       }
-      document.getElementById('jitsi-contenedor').innerHTML = '';
+      document.getElementById('sala-video-contenedor').innerHTML = '';
       document.getElementById('modal-video').classList.add('hidden');
     }
 
-    async function iniciarGrabacionAudienciaJitsi() {
-      if (!expIdSalaActiva) return;
+    async function iniciarGrabacionAudiencia() {
+      if (!expIdSala) return;
       try {
-        streamGrabacionJitsi = await navigator.mediaDevices.getDisplayMedia({
+        streamGrabacionSala = await navigator.mediaDevices.getDisplayMedia({
           video: true,
           audio: true
         });
 
-        trozosJitsi = [];
+        trozosAudienciaSala = [];
         const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
           ? 'video/webm;codecs=vp9,opus'
           : 'video/webm';
 
-        grabadoraJitsi = new MediaRecorder(streamGrabacionJitsi, { mimeType: mime });
-        grabadoraJitsi.ondataavailable = ev => {
-          if (ev.data && ev.data.size > 0) trozosJitsi.push(ev.data);
+        grabadoraAudienciaSala = new MediaRecorder(streamGrabacionSala, { mimeType: mime });
+        grabadoraAudienciaSala.ondataavailable = ev => {
+          if (ev.data && ev.data.size > 0) trozosAudienciaSala.push(ev.data);
         };
-        grabadoraJitsi.onstop = () => subirGrabacionJitsi(expIdSalaActiva, folioSalaActiva);
+        grabadoraAudienciaSala.onstop = () => subirGrabacionSala(expIdSala, folioSala);
 
-        streamGrabacionJitsi.getVideoTracks()[0].onended = () => {
-          if (grabadoraJitsi && grabadoraJitsi.state !== 'inactive') {
-            detenerGrabacionAudienciaJitsi();
+        streamGrabacionSala.getVideoTracks()[0].onended = () => {
+          if (grabadoraAudienciaSala && grabadoraAudienciaSala.state !== 'inactive') {
+            detenerGrabacionAudiencia();
           }
         };
 
-        grabadoraJitsi.start(1000);
+        grabadoraAudienciaSala.start(1000);
         document.getElementById('btn-grabar-aud').classList.add('hidden');
         document.getElementById('btn-detener-aud').classList.remove('hidden');
         document.getElementById('grabacion-estado').innerText =
@@ -883,27 +883,27 @@ Validado por el Órgano Interno de Control del Instituto de Justicia Alternativa
       }
     }
 
-    function detenerGrabacionAudienciaJitsi() {
-      if (grabadoraJitsi && grabadoraJitsi.state !== 'inactive') {
-        grabadoraJitsi.stop();
+    function detenerGrabacionAudiencia() {
+      if (grabadoraAudienciaSala && grabadoraAudienciaSala.state !== 'inactive') {
+        grabadoraAudienciaSala.stop();
       }
-      if (streamGrabacionJitsi) {
-        streamGrabacionJitsi.getTracks().forEach(t => t.stop());
-        streamGrabacionJitsi = null;
+      if (streamGrabacionSala) {
+        streamGrabacionSala.getTracks().forEach(t => t.stop());
+        streamGrabacionSala = null;
       }
       document.getElementById('btn-grabar-aud').classList.remove('hidden');
       document.getElementById('btn-detener-aud').classList.add('hidden');
       document.getElementById('grabacion-estado').innerText = 'Procesando y guardando prueba...';
     }
 
-    async function subirGrabacionJitsi(expId, folio) {
-      if (!trozosJitsi.length || !expId) {
+    async function subirGrabacionSala(expId, folio) {
+      if (!trozosAudienciaSala.length || !expId) {
         document.getElementById('grabacion-estado').innerText = 'No se capturó video para guardar.';
         return;
       }
 
-      const blob = new Blob(trozosJitsi, { type: 'video/webm' });
-      trozosJitsi = [];
+      const blob = new Blob(trozosAudienciaSala, { type: 'video/webm' });
+      trozosAudienciaSala = [];
 
       const formData = new FormData();
       formData.append('archivo', blob, `audiencia_${folio || expId}_${Date.now()}.webm`);
